@@ -1,3 +1,17 @@
+0.2.0 - [17/11/2026]
+    - All'avvio l'app controlla le release su GitHub e, se c'è una versione nuova, mostra il bottone «Aggiorna a vX.Y.Z»: su Windows scarica l'installer firmato, lo installa e riavvia; su Android apre il download dell'APK (file: src/lib/aggiornamento.svelte.ts, src/components/Aggiornamento.svelte, src-tauri/src/lib.rs, src-tauri/tauri.conf.json)
+    - L'installer Windows viene firmato anche con la chiave dell'updater, che resta fuori dalla repo (file: build-windows.ps1)
+    - Nuovo script che pubblica una release su GitHub: controlla versione e changelog, crea installer e APK, latest.json, tag e release con le note di versioni.txt (file: release.ps1)
+
+0.1.4 - [16/11/2026]
+    - In Liquid glass le icone della legenda sono gocce d'acqua colorata, con riflesso, luce sul fondo e ombra, in chiaro e in scuro (file: src/styles/base.css)
+
+0.1.3 - [16/11/2026]
+    - Claymorphism ripensato come pasta da modellare: sfondo azzurro pastello, riquadri giallo burro, accenti rosa fragola, anche in scuro (file: src/styles/claymorphism.css, src/lib/aspetto.svelte.ts)
+    - Nel Claymorphism le icone della legenda sporgono in rilievo invece di essere incavate
+    - La legenda di batterie e aree è centrata orizzontalmente in tutti gli stili (file: src/styles/base.css)
+    - Piano aggiornato alle decisioni della revisione e nuova roadmap visiva con mappa concettuale, fasi ed esempi (file: docs/piano-priority-planner.md, docs/roadmap/data.js)
+
 0.1.2 - [16/11/2026]
     - La build Android ufficiale cerca Node nel PATH invece che in un percorso fisso di questo PC (file: src-tauri/gen/android/buildSrc/src/main/java/it/priorityplanner/app/kotlin/BuildTask.kt)
     - Il .gitignore esclude anche la configurazione locale dei bottoni di build, i file .env e la cache Kotlin, così il progetto si può pubblicare senza percorsi personali

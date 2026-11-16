@@ -6,8 +6,10 @@
   che rompe i file .cmd di node_modules\.bin.
   Firma: certificato autofirmato "CN=Priority Planner" nell'archivio dell'utente (creato alla prima build,
   valido 5 anni). Tauri firma sia priority-planner.exe sia l'installer.
+  Aggiornamenti: la chiave privata dell'updater (%USERPROFILE%\.tauri\priority-planner-updater.key, fuori dalla repo)
+  firma l'installer per l'aggiornamento automatico e produce il file .sig accanto.
   Uso: powershell -NoProfile -ExecutionPolicy Bypass -File build-windows.ps1
-  Risultato: installer\PriorityPlanner-<versione>-setup.exe e installer\PriorityPlanner-certificato.cer
+  Risultato: installer\PriorityPlanner-<versione>-setup.exe (+ .sig) e installer\PriorityPlanner-certificato.cer
 #>
 $ErrorActionPreference = 'Continue'
 Set-Location $PSScriptRoot
@@ -50,6 +52,18 @@ $signConfig = Join-Path $env:TEMP 'priority-planner-sign.json'
     'sign', '/sha1', $cert.Thumbprint, '/s', 'My', '/fd', 'sha256', '/tr', 'http://timestamp.digicert.com', '/td', 'sha256', '%1') } } } } |
     ConvertTo-Json -Depth 6 | Set-Content -Encoding ascii -LiteralPath $signConfig
 
+# Chiave dell'updater: senza di lei l'app installata non accetterebbe questo installer come aggiornamento.
+$updaterKey = Join-Path $env:USERPROFILE '.tauri\priority-planner-updater.key'
+if (-not (Test-Path $updaterKey)) {
+    Write-Host "MANCA la chiave dell'updater: $updaterKey"
+    Write-Host '  Ripristinala dal backup. Se e'' persa davvero, generane una nuova e aggiorna "pubkey" in src-tauri\tauri.conf.json:'
+    Write-Host "  node node_modules\@tauri-apps\cli\tauri.js signer generate --ci -p """" -w ""$updaterKey"""
+    Write-Host '  ATTENZIONE: le app gia'' installate con la chiave vecchia non riceveranno piu'' aggiornamenti automatici.'
+    exit 1
+}
+$env:TAURI_SIGNING_PRIVATE_KEY = $updaterKey
+$env:TAURI_SIGNING_PRIVATE_KEY_PASSWORD = ''
+
 & node node_modules\@tauri-apps\cli\tauri.js build --bundles nsis --config $signConfig
 if ($LASTEXITCODE -ne 0) { Write-Host 'Build Windows non riuscita: vedi gli errori sopra.'; exit $LASTEXITCODE }
 
@@ -57,6 +71,8 @@ $setup = Get-ChildItem "src-tauri\target\release\bundle\nsis\*_$($version)_x64-s
 if (-not $setup) { Write-Host "Installer non trovato in src-tauri\target\release\bundle\nsis."; exit 1 }
 $out = "installer\PriorityPlanner-$version-setup.exe"
 Copy-Item $setup.FullName $out -Force
+if (-not (Test-Path "$($setup.FullName).sig")) { Write-Host 'Firma per l''aggiornamento (.sig) non creata: vedi gli errori sopra.'; exit 1 }
+Copy-Item "$($setup.FullName).sig" "$out.sig" -Force
 $sig = Get-AuthenticodeSignature $out
 if (-not $sig.SignerCertificate -or $sig.SignerCertificate.Thumbprint -ne $cert.Thumbprint) { Write-Host "Installer NON firmato ($($sig.Status)): vedi gli errori sopra."; exit 1 }
 Write-Host ('=' * 70)

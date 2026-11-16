@@ -7,7 +7,7 @@ export const STILI: Record<Stile, { nome: string; nota: string; chiaro: string; 
   glass: { nome: "Liquid glass", nota: "Vetro trasparente su una luce sfumata", chiaro: "#e9ece6", scuro: "#0b0f0d" },
   neu: { nome: "Neumorfismo", nota: "Fasce incavate, carte in rilievo", chiaro: "#e4e2da", scuro: "#25292a" },
   skeu: { nome: "Skeuomorfismo", nota: "Agenda di carta, pelle, ceramica e ottone", chiaro: "#e6dcc8", scuro: "#2b2119" },
-  clay: { nome: "Claymorphism", nota: "Forme gonfie e opache, come argilla", chiaro: "#daddd5", scuro: "#191f1c" },
+  clay: { nome: "Claymorphism", nota: "Forme gonfie e opache, come pasta da modellare", chiaro: "#d5e3f4", scuro: "#1f2338" },
 };
 
 const CHIAVE = "priority-planner.aspetto.v1";

@@ -2,7 +2,11 @@
   import Settimana from "./components/Settimana.svelte";
   import StileDialog from "./components/StileDialog.svelte";
   import Icona from "./components/Icona.svelte";
+  import Aggiornamento from "./components/Aggiornamento.svelte";
   import { aspetto, applica, STILI } from "./lib/aspetto.svelte";
+  import { controllaAggiornamenti } from "./lib/aggiornamento.svelte";
+
+  controllaAggiornamenti();
 
   let stile: StileDialog;
 
@@ -22,6 +26,7 @@
       <small class="version">v{__APP_VERSION__}</small>
     </div>
     <div class="bar-actions">
+      <Aggiornamento />
       <button class="icon-button" type="button" onclick={cambiaTema} aria-label={aspetto.tema === "dark" ? "Passa al tema chiaro" : "Passa al tema scuro"} title={aspetto.tema === "dark" ? "Tema chiaro" : "Tema scuro"}>
         <Icona nome={aspetto.tema === "dark" ? "sole" : "luna"} />
       </button>

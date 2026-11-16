@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roadmap</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div class="titolo">
+    <h1 id="titolo"></h1>
+    <span class="agg" id="agg"></span>
+  </div>
+  <nav id="nav"></nav>
+  <div class="comandi">
+    <select id="lingua" title="Lingua / Language"><option value="it">IT</option><option value="en">EN</option></select>
+    <label class="interruttore" id="lbl-modifica"><input type="checkbox" id="modifica"><span id="txt-modifica"></span></label>
+    <button id="scarica" class="mini"></button>
+    <button id="salva" class="primario"></button>
+  </div>
+</header>
+<main>
+  <section id="struttura"></section>
+  <section id="mappa"></section>
+  <section id="kanban"></section>
+  <section id="compiti"></section>
+  <section id="operatori"></section>
+  <section id="registro"></section>
+</main>
+<div id="modale" class="modale" hidden></div>
+<div id="avviso" class="avviso" hidden></div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
