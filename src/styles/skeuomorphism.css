@@ -38,9 +38,16 @@
   --sk-brass-b: #bf8e3d;
   --sk-brass-edge: #76541a;
   --sk-brass-ink: #3a2505;
-  --sk-paper: #f8f2e4;
-  --sk-rule: rgb(70 110 150 / .22);
-  --sk-margin: rgb(180 70 60 / .35);
+  --sk-paper: #fbf5e6;
+  --sk-paper-age: rgb(196 158 96 / .2);
+  --sk-rule: rgb(70 110 150 / .26);
+  --sk-rule-soft: rgb(70 110 150 / .13);
+  --sk-margin: rgb(180 70 60 / .42);
+  --sk-pencil: #7a5a3a;
+  --sk-highlight: rgb(255 214 74 / .62);
+  --sk-tape: rgb(222 140 92 / .78);
+  --sk-tape-ink: #3a1a08;
+  --sk-binding: rgb(70 45 20 / .3);
   --sk-gloss: rgb(255 255 255 / .7);
 }
 
@@ -75,9 +82,16 @@
   --sk-brass-b: #b8873a;
   --sk-brass-edge: #4f3711;
   --sk-brass-ink: #2f1d03;
-  --sk-paper: #342d25;
-  --sk-rule: rgb(160 190 220 / .14);
-  --sk-margin: rgb(230 120 100 / .3);
+  --sk-paper: #3e342a;
+  --sk-paper-age: rgb(0 0 0 / .3);
+  --sk-rule: rgb(170 200 230 / .2);
+  --sk-rule-soft: rgb(170 200 230 / .09);
+  --sk-margin: rgb(235 125 105 / .4);
+  --sk-pencil: #d6bf98;
+  --sk-highlight: rgb(255 205 70 / .32);
+  --sk-tape: rgb(214 132 84 / .8);
+  --sk-tape-ink: #2b1205;
+  --sk-binding: rgb(0 0 0 / .45);
   --sk-gloss: rgb(255 235 200 / .3);
 }
 
@@ -126,26 +140,79 @@
 :root[data-style=skeu] .version { color: var(--sk-leather-ink); opacity: .8; }
 :root[data-style=skeu] .brand-mark { background: rgb(0 0 0 / .4); box-shadow: inset 0 1px 2px rgb(0 0 0 / .5), 0 1px 0 rgb(255 255 255 / .18); }
 
-/* La pagina dell'agenda: carta con margine rosso; le fasce sono righe della pagina. */
+/* La pagina dell'agenda: carta un po' ingiallita ai bordi, doppio margine rosso, pila di fogli sotto.
+   Lun–ven sulla pagina sinistra, sab–dom sulla destra: in mezzo la piega della rilegatura. */
 :root[data-style=skeu] .pane {
+  --head-bg: var(--sk-paper);
   background:
-    linear-gradient(90deg, transparent 18px, var(--sk-margin) 18px 19.5px, transparent 19.5px),
+    linear-gradient(90deg, transparent 16px, var(--sk-margin) 16px 17px, transparent 17px 20px, var(--sk-margin) 20px 21px, transparent 21px),
+    radial-gradient(140% 100% at 50% 40%, transparent 62%, var(--sk-paper-age)),
+    radial-gradient(60% 50% at 20% 15%, rgb(255 255 255 / .16), transparent 70%),
     var(--sk-paper);
   border: 1px solid var(--edge);
   box-shadow: 0 1px 0 var(--sk-cer-edge), 0 3px 0 -1px var(--sk-paper), 0 4px 0 -1px var(--sk-cer-edge), 0 6px 0 -2px var(--sk-paper), 0 7px 0 -2px var(--sk-cer-edge), var(--lift);
 }
-:root[data-style=skeu] .pane-head { padding-left: 34px; border-bottom: 2px solid var(--sk-margin); }
-:root[data-style=skeu] .legend { padding-left: 34px; }
-:root[data-style=skeu] .week-grid { padding-left: 30px; gap: 0; scrollbar-color: var(--sk-cer-edge) transparent; }
-:root[data-style=skeu] .day { gap: 0; border-left: 1px solid var(--sk-rule); }
+:root[data-style=skeu][data-theme=dark] .pane {
+  background:
+    linear-gradient(90deg, transparent 16px, var(--sk-margin) 16px 17px, transparent 17px 20px, var(--sk-margin) 20px 21px, transparent 21px),
+    radial-gradient(90% 70% at 50% 10%, rgb(255 210 140 / .1), transparent 70%),
+    radial-gradient(140% 100% at 50% 40%, transparent 55%, var(--sk-paper-age)),
+    var(--sk-paper);
+}
+:root[data-style=skeu] .pane-head { padding-left: 36px; border-bottom: 3px double var(--sk-margin); }
+:root[data-style=skeu] .pane-head h1 { font-weight: 600; letter-spacing: -.01em; }
+:root[data-style=skeu] .week-empty { font-family: var(--display); font-style: italic; color: var(--sk-pencil); }
+:root[data-style=skeu] .legend { padding-left: 36px; border-top: 3px double var(--sk-margin); }
+:root[data-style=skeu] .week-grid { padding: 0 18px 18px 30px; gap: 0; scrollbar-color: var(--sk-cer-edge) transparent; }
+:root[data-style=skeu] .day { gap: 0; border-left: 1px solid var(--sk-rule-soft); }
 :root[data-style=skeu] .day:first-child { border-left: 0; }
-:root[data-style=skeu] .day-head { border-radius: 0; border-bottom: 1px solid var(--sk-rule); font-family: var(--display); }
+/* La piega tra le due pagine. */
+:root[data-style=skeu] .day:nth-child(6) {
+  border-left: 0;
+  box-shadow: inset 18px 0 16px -14px var(--sk-binding), -18px 0 16px -14px var(--sk-binding);
+}
+:root[data-style=skeu] .holiday { background: color-mix(in srgb, var(--l3) 6%, transparent); }
+
+:root[data-style=skeu] .day-head {
+  align-items: baseline;
+  padding: 14px 10px 8px;
+  border-radius: 0;
+  border-bottom: 1px solid var(--sk-rule);
+  font-family: var(--display);
+}
+:root[data-style=skeu] .day-name { font-variant: small-caps; text-transform: lowercase; letter-spacing: .06em; font-size: 15px; color: var(--sk-pencil); }
+:root[data-style=skeu] .day-date { font-size: 26px; font-weight: 600; }
+/* Oggi: il numero ripassato con l'evidenziatore e un pezzo di nastro adesivo. */
+:root[data-style=skeu] .today .day-date {
+  padding: 0 4px;
+  margin: 0 -4px;
+  background: linear-gradient(176deg, transparent 18%, var(--sk-highlight) 20% 78%, transparent 80%);
+}
+:root[data-style=skeu] .today-chip {
+  padding: 3px 12px;
+  border-radius: 0;
+  background: var(--sk-tape);
+  color: var(--sk-tape-ink);
+  font-family: var(--display);
+  font-style: italic;
+  font-weight: 600;
+  transform: rotate(-4deg);
+  clip-path: polygon(0 8%, 4% 0, 8% 10%, 12% 0, 88% 0, 92% 10%, 96% 0, 100% 8%, 100% 92%, 96% 100%, 92% 90%, 88% 100%, 12% 100%, 8% 90%, 4% 100%, 0 92%);
+  box-shadow: none;
+}
+
+/* Le fasce sono righe della pagina; dentro una fascia lunga, una riga leggera per ogni ora. */
 :root[data-style=skeu] .slots { gap: 0; }
-:root[data-style=skeu] .slot { border: 0; border-bottom: 1px solid var(--sk-rule); border-radius: 0; background: transparent; }
-:root[data-style=skeu] .holiday { background: color-mix(in srgb, var(--l3) 7%, transparent); }
-:root[data-style=skeu] .today .slot { border-bottom-color: color-mix(in srgb, var(--signal) 45%, var(--sk-rule)); }
-:root[data-style=skeu] .today-chip { border-radius: 3px; transform: rotate(-3deg); box-shadow: 0 1px 2px rgb(30 15 5 / .35); }
-:root[data-style=skeu] .pause { border-bottom: 1px dashed var(--sk-rule); }
+:root[data-style=skeu] .slot {
+  padding: 5px 10px;
+  border: 0;
+  border-bottom: 1px solid var(--sk-rule);
+  border-radius: 0;
+  background: repeating-linear-gradient(180deg, transparent 0 calc(100% / var(--span) - 1px), var(--sk-rule-soft) calc(100% / var(--span) - 1px) calc(100% / var(--span)));
+}
+:root[data-style=skeu] .slot-time { font-family: var(--display); font-style: italic; font-size: 13px; font-weight: 400; color: var(--sk-pencil); }
+:root[data-style=skeu] .today .slot { border-bottom-color: var(--sk-rule); background-color: color-mix(in srgb, var(--sk-highlight) 18%, transparent); }
+:root[data-style=skeu] .pause { padding: 2px 0; border-bottom: 1px dashed var(--sk-rule); font-family: var(--display); font-style: italic; color: var(--sk-pencil); }
 
 /* Bottoni in ceramica; il comando principale in ottone. */
 :root[data-style=skeu] .icon-button,

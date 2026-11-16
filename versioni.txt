@@ -1,3 +1,6 @@
+0.2.1 - [17/11/2026]
+    - Skeuomorfismo: la settimana diventa una pagina d'agenda di carta, con bordi ingialliti, doppio margine rosso, piega della rilegatura tra venerdì e sabato, orari in corsivo a matita, numero di oggi ripassato con l'evidenziatore e nastro adesivo «oggi» (file: src/styles/skeuomorphism.css)
+
 0.2.0 - [17/11/2026]
     - All'avvio l'app controlla le release su GitHub e, se c'è una versione nuova, mostra il bottone «Aggiorna a vX.Y.Z»: su Windows scarica l'installer firmato, lo installa e riavvia; su Android apre il download dell'APK (file: src/lib/aggiornamento.svelte.ts, src/components/Aggiornamento.svelte, src-tauri/src/lib.rs, src-tauri/tauri.conf.json)
     - L'installer Windows viene firmato anche con la chiave dell'updater, che resta fuori dalla repo (file: build-windows.ps1)
