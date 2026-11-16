@@ -1,0 +1,13 @@
+0.1.2 - [16/11/2026]
+    - La build Android ufficiale cerca Node nel PATH invece che in un percorso fisso di questo PC (file: src-tauri/gen/android/buildSrc/src/main/java/it/priorityplanner/app/kotlin/BuildTask.kt)
+    - Il .gitignore esclude anche la configurazione locale dei bottoni di build, i file .env e la cache Kotlin, così il progetto si può pubblicare senza percorsi personali
+
+0.1.1 - [14/11/2026]
+    - L'installer Windows e il programma installato sono firmati con un certificato autofirmato creato alla prima build; lo script esporta il .cer da importare sui PC per togliere l'avviso (file: build-windows.ps1)
+
+0.1.0 - [09/11/2026]
+    - Prima versione: app Tauri 2 + Svelte per Windows e tablet Android, con la settimana corrente vuota e le fasce orarie feriali e festive (notte 0–3:30 solo prima di un giorno festivo) (file: src/components/Settimana.svelte, src/lib/fasce.ts)
+    - Quattro stili presi da GridApp e adattati, ognuno in chiaro e scuro: Liquid glass, Neumorfismo, Skeuomorfismo, Claymorphism, scelti dalla finestra «Stile» con Applica/Annulla (file: src/styles/base.css, src/styles/neumorphism.css, src/styles/skeuomorphism.css, src/styles/claymorphism.css, src/components/StileDialog.svelte)
+    - Legenda di batterie e aree con le sole icone approvate in revisione (Emotiva = ❤️‍🩹) (file: src/lib/energia.ts)
+    - Script di build per l'installer Windows e per l'APK Android senza symlink (file: build-windows.ps1, build-android.cmd, build-android-alt.ps1)
+    - Piano e pagina di revisione delle decisioni con la demo del bottone «Proponi settimana» (file: piano-priority-planner.md, revisione-piano-priority-planner.html)

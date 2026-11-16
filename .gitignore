@@ -1,0 +1,17 @@
+node_modules/
+dist/
+src-tauri/target/
+src-tauri/gen/android/.gradle/
+src-tauri/gen/android/build/
+src-tauri/gen/android/app/build/
+src-tauri/gen/android/app/src/main/jniLibs/
+*.log
+apk/
+installer/
+build-logs/
+src-tauri/gen/android/.kotlin/
+.env*
+# Configurazione locale dei bottoni di build: contiene percorsi di questo PC.
+script-buttons.json
+# Note di revisione con frasi personali.
+revisione-piano-priority-planner.html

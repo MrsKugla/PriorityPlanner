@@ -1,0 +1,96 @@
+/* Claymorphism: argilla minerale salvia, opaca. Ogni oggetto = ombra direzionale + modellatura interna
+   (luce in alto a sinistra, ombra in basso a destra). Al massimo due livelli: riquadro → comando. Le fasce sono un pozzetto piatto. */
+
+:root[data-style=clay] {
+  color-scheme: light;
+  --field: #daddd5;
+  --ink: #263128;
+  --muted: #4e5b50;
+  --glass: #d5dccd;
+  --glass-strong: #c7d0c0;
+  --glass-press: #b2c4a2;
+  --well: #cdd5c5;
+  --came: rgb(64 83 52 / .3);
+  --rim: rgb(255 255 244 / .6);
+  --hairline: rgb(64 83 52 / .26);
+  --lead: #34512a;
+  --on-lead: #f5f8ef;
+  --float: #d5dccd;
+  --edge: transparent;
+  --lift: none;
+  --head-bg: #d5dccd;
+  --c-pri: #a8bf94;
+  --c-on-pri: #20341a;
+  --c-shade: 64 83 52;
+  --c-light: 255 255 244;
+  --c-shine: .72;
+  --c-depth: .36;
+  --c-drop: .24;
+  --c-clay-shadow: 2px 4px 4px rgb(var(--c-shade) / var(--c-drop)), 7px 10px 16px -5px rgb(var(--c-shade) / var(--c-depth)), inset 2px 2px 3px rgb(var(--c-light) / var(--c-shine)), inset -4px -5px 7px rgb(var(--c-shade) / var(--c-depth));
+  --c-clay-pressed: 1px 2px 3px rgb(var(--c-shade) / var(--c-drop)), inset 1px 1px 2px rgb(var(--c-light) / var(--c-shine)), inset -2px -3px 4px rgb(var(--c-shade) / var(--c-depth));
+  --c-sink: inset 2px 3px 5px rgb(var(--c-shade) / .24), inset -1px -1px 2px rgb(var(--c-light) / .65);
+  --backdrop: rgb(38 49 40 / .4);
+  --radius-slot: 12px;
+}
+
+:root[data-style=clay][data-theme=dark] {
+  color-scheme: dark;
+  --field: #191f1c;
+  --ink: #f1f4e9;
+  --muted: #c0cbbd;
+  --glass: #35463b;
+  --glass-strong: #455649;
+  --glass-press: #526b48;
+  --well: #2d3c32;
+  --came: rgb(9 23 13 / .6);
+  --rim: rgb(213 232 199 / .18);
+  --hairline: rgb(213 232 199 / .2);
+  --lead: #c5dcb2;
+  --on-lead: #20341a;
+  --float: #35463b;
+  --head-bg: #35463b;
+  --c-pri: #aac291;
+  --c-shade: 9 23 13;
+  --c-light: 213 232 199;
+  --c-shine: .23;
+  --c-depth: .64;
+  --c-drop: .5;
+  --c-sink: inset 2px 3px 5px rgb(9 23 13 / .6), inset -1px -1px 2px rgb(213 232 199 / .15);
+  --backdrop: rgb(0 0 0 / .6);
+}
+
+:root[data-style=clay] body { background: var(--field); }
+:root[data-style=clay] ::selection { background: var(--glass-press); color: var(--ink); }
+:root[data-style=clay] .glass,
+:root[data-style=clay] .day-head,
+:root[data-style=clay] .sheet::backdrop { -webkit-backdrop-filter: none; backdrop-filter: none; }
+
+/* Livello 1: lastre di argilla. */
+:root[data-style=clay] .glass,
+:root[data-style=clay] .sheet { background: var(--glass); border-color: transparent; box-shadow: var(--c-clay-shadow); }
+:root[data-style=clay] .week-grid { scrollbar-color: rgb(var(--c-shade) / .5) transparent; }
+
+/* Livello 2: comandi modellati. */
+:root[data-style=clay] .icon-button,
+:root[data-style=clay] .style-select,
+:root[data-style=clay] .text-button,
+:root[data-style=clay] .style-choice {
+  border: 0;
+  background: var(--glass-strong);
+  box-shadow: var(--c-clay-shadow);
+  transition: box-shadow .25s var(--ease-out), transform .35s var(--ease-press), background .25s var(--ease-out);
+}
+:root[data-style=clay] .icon-button:active,
+:root[data-style=clay] .style-select:active,
+:root[data-style=clay] .text-button:active { box-shadow: var(--c-clay-pressed); transform: translateY(1px); }
+:root[data-style=clay] .ink-button { background: var(--c-pri); color: var(--c-on-pri); box-shadow: var(--c-clay-shadow); font-weight: 700; }
+:root[data-style=clay] .ink-button:active { box-shadow: var(--c-clay-pressed); }
+:root[data-style=clay] .style-choice:has(input:checked) { background: var(--glass-press); box-shadow: var(--c-clay-pressed); }
+:root[data-style=clay] .style-choice-swatch { box-shadow: var(--c-sink); }
+:root[data-style=clay] .today-chip { box-shadow: var(--c-clay-pressed); }
+
+/* Pozzetti piatti: le fasce. */
+:root[data-style=clay] .slot { border: 0; background: var(--well); box-shadow: var(--c-sink); }
+:root[data-style=clay] .holiday .slot { background: color-mix(in srgb, var(--well) 84%, var(--l3)); }
+:root[data-style=clay] .today .slot { box-shadow: var(--c-sink), inset 0 0 0 1.5px color-mix(in srgb, var(--signal) 65%, transparent); }
+:root[data-style=clay] .legend-icon { border-radius: 10px; box-shadow: var(--c-sink); }

@@ -1,0 +1,16 @@
+[package]
+name = "priority-planner"
+version = "0.1.2"
+description = "Organizza la settimana in base alla tua energia"
+authors = ["Benedetta Scattolin"]
+edition = "2021"
+
+[lib]
+name = "priority_planner_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }

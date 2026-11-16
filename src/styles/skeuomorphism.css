@@ -1,0 +1,180 @@
+/* Skeuomorfismo: un'agenda sul tavolo.
+   Lino chiaro / noce scuro · copertina in pelle cucita · pagine di carta rigata · bottoni in ceramica e ottone · titoli con grazie. */
+
+:root[data-style=skeu] {
+  --display: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --field: #e6dcc8;
+  --ink: #2f2419;
+  --muted: #554431;
+  --glass: #f8f2e4;
+  --glass-strong: #f6eedb;
+  --glass-press: #e9ddc2;
+  --well: transparent;
+  --came: rgb(60 40 20 / .3);
+  --rim: rgb(255 255 255 / .55);
+  --hairline: rgb(60 40 20 / .24);
+  --lead: #3b2616;
+  --on-lead: #f6e6c0;
+  --signal: #b5612c;
+  --on-signal: #fff4e2;
+  --float: #6b4330;
+  --edge: rgb(40 22 10 / .45);
+  --lift: 0 8px 14px -4px rgb(30 15 5 / .5), 0 2px 3px rgb(30 15 5 / .3);
+  --head-bg: #f8f2e4;
+  --backdrop: rgb(30 18 8 / .5);
+  --radius-pane: 14px;
+  --radius-control: 12px;
+  --radius-slot: 4px;
+  --sk-leather-a: #7a4a33;
+  --sk-leather-b: #573523;
+  --sk-leather-ink: #f6e3b6;
+  --sk-stitch: #e8d09f;
+  --sk-cer-a: #fffaf0;
+  --sk-cer-b: #e7dcc7;
+  --sk-cer-edge: #a99573;
+  --sk-cer-side: #9b8764;
+  --sk-cer-ink: #34271a;
+  --sk-brass-a: #f0d393;
+  --sk-brass-b: #bf8e3d;
+  --sk-brass-edge: #76541a;
+  --sk-brass-ink: #3a2505;
+  --sk-paper: #f8f2e4;
+  --sk-rule: rgb(70 110 150 / .22);
+  --sk-margin: rgb(180 70 60 / .35);
+  --sk-gloss: rgb(255 255 255 / .7);
+}
+
+:root[data-style=skeu][data-theme=dark] {
+  --field: #2b2119;
+  --ink: #f2e6cf;
+  --muted: #d3c1a1;
+  --glass: #342d25;
+  --glass-strong: #4c4034;
+  --glass-press: #5a4b3c;
+  --came: rgb(0 0 0 / .55);
+  --rim: rgb(255 235 200 / .22);
+  --hairline: rgb(255 235 200 / .17);
+  --lead: #e0bd78;
+  --on-lead: #2f1d03;
+  --signal: #e59a5c;
+  --on-signal: #2b1505;
+  --float: #3a241b;
+  --edge: rgb(0 0 0 / .7);
+  --lift: 0 10px 18px -4px rgb(0 0 0 / .65), 0 2px 3px rgb(0 0 0 / .4);
+  --head-bg: #342d25;
+  --sk-leather-a: #4c2f21;
+  --sk-leather-b: #33201a;
+  --sk-leather-ink: #f0d7a8;
+  --sk-stitch: #c9ad79;
+  --sk-cer-a: #6d5d4b;
+  --sk-cer-b: #4c4034;
+  --sk-cer-edge: #241b13;
+  --sk-cer-side: #21190f;
+  --sk-cer-ink: #f7ecd5;
+  --sk-brass-a: #dcb66e;
+  --sk-brass-b: #b8873a;
+  --sk-brass-edge: #4f3711;
+  --sk-brass-ink: #2f1d03;
+  --sk-paper: #342d25;
+  --sk-rule: rgb(160 190 220 / .14);
+  --sk-margin: rgb(230 120 100 / .3);
+  --sk-gloss: rgb(255 235 200 / .3);
+}
+
+/* Il tavolo: lino chiaro, noce scuro. */
+:root[data-style=skeu] body {
+  background:
+    radial-gradient(120% 90% at 50% 0%, transparent 55%, rgb(70 45 20 / .16)),
+    repeating-linear-gradient(0deg, rgb(255 255 255 / .2) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgb(120 95 60 / .075) 0 1px, transparent 1px 3px),
+    linear-gradient(180deg, #e6dcc8, #d6c9ae);
+}
+:root[data-style=skeu][data-theme=dark] body {
+  background:
+    radial-gradient(120% 90% at 50% 0%, transparent 50%, rgb(0 0 0 / .45)),
+    repeating-linear-gradient(90deg, rgb(255 235 200 / .035) 0 1px, transparent 1px 7px, rgb(0 0 0 / .16) 7px 8px, transparent 8px 21px),
+    linear-gradient(180deg, #2b2119, #1d140d);
+}
+:root[data-style=skeu] ::selection { background: #d7a76c; color: #2b1d0f; }
+:root[data-style=skeu] .glass,
+:root[data-style=skeu] .day-head,
+:root[data-style=skeu] .sheet::backdrop { -webkit-backdrop-filter: none; backdrop-filter: none; }
+
+/* La copertina in pelle cucita: la barra in alto. */
+:root[data-style=skeu] .bar {
+  --ink: var(--sk-leather-ink);
+  --muted: var(--sk-leather-ink);
+  --hairline: rgb(246 227 182 / .35);
+  color: var(--sk-leather-ink);
+  border: 0;
+  background:
+    radial-gradient(rgb(0 0 0 / .1) .6px, transparent .9px) 0 0 / 4px 4px,
+    linear-gradient(180deg, var(--sk-leather-a), var(--sk-leather-b));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .2), inset 0 -3px 5px rgb(0 0 0 / .4), var(--lift);
+}
+:root[data-style=skeu] .bar::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 2px dashed var(--sk-stitch);
+  border-radius: calc(var(--radius-pane) - 4px);
+  opacity: .75;
+  pointer-events: none;
+}
+:root[data-style=skeu] .bar > * { position: relative; }
+:root[data-style=skeu] .wordmark { text-shadow: 0 -1px 0 rgb(0 0 0 / .55), 0 1px 0 rgb(255 255 255 / .14); }
+:root[data-style=skeu] .version { color: var(--sk-leather-ink); opacity: .8; }
+:root[data-style=skeu] .brand-mark { background: rgb(0 0 0 / .4); box-shadow: inset 0 1px 2px rgb(0 0 0 / .5), 0 1px 0 rgb(255 255 255 / .18); }
+
+/* La pagina dell'agenda: carta con margine rosso; le fasce sono righe della pagina. */
+:root[data-style=skeu] .pane {
+  background:
+    linear-gradient(90deg, transparent 18px, var(--sk-margin) 18px 19.5px, transparent 19.5px),
+    var(--sk-paper);
+  border: 1px solid var(--edge);
+  box-shadow: 0 1px 0 var(--sk-cer-edge), 0 3px 0 -1px var(--sk-paper), 0 4px 0 -1px var(--sk-cer-edge), 0 6px 0 -2px var(--sk-paper), 0 7px 0 -2px var(--sk-cer-edge), var(--lift);
+}
+:root[data-style=skeu] .pane-head { padding-left: 34px; border-bottom: 2px solid var(--sk-margin); }
+:root[data-style=skeu] .legend { padding-left: 34px; }
+:root[data-style=skeu] .week-grid { padding-left: 30px; gap: 0; scrollbar-color: var(--sk-cer-edge) transparent; }
+:root[data-style=skeu] .day { gap: 0; border-left: 1px solid var(--sk-rule); }
+:root[data-style=skeu] .day:first-child { border-left: 0; }
+:root[data-style=skeu] .day-head { border-radius: 0; border-bottom: 1px solid var(--sk-rule); font-family: var(--display); }
+:root[data-style=skeu] .slots { gap: 0; }
+:root[data-style=skeu] .slot { border: 0; border-bottom: 1px solid var(--sk-rule); border-radius: 0; background: transparent; }
+:root[data-style=skeu] .holiday { background: color-mix(in srgb, var(--l3) 7%, transparent); }
+:root[data-style=skeu] .today .slot { border-bottom-color: color-mix(in srgb, var(--signal) 45%, var(--sk-rule)); }
+:root[data-style=skeu] .today-chip { border-radius: 3px; transform: rotate(-3deg); box-shadow: 0 1px 2px rgb(30 15 5 / .35); }
+:root[data-style=skeu] .pause { border-bottom: 1px dashed var(--sk-rule); }
+
+/* Bottoni in ceramica; il comando principale in ottone. */
+:root[data-style=skeu] .icon-button,
+:root[data-style=skeu] .style-select,
+:root[data-style=skeu] .text-button,
+:root[data-style=skeu] .style-choice {
+  border: 1px solid var(--sk-cer-edge);
+  background: linear-gradient(180deg, var(--sk-cer-a), var(--sk-cer-b));
+  color: var(--sk-cer-ink);
+  box-shadow: 0 2px 0 var(--sk-cer-side), inset 0 1px 0 var(--sk-gloss), 0 5px 8px -3px rgb(30 15 5 / .35);
+}
+:root[data-style=skeu] .icon-button:active,
+:root[data-style=skeu] .style-select:active,
+:root[data-style=skeu] .text-button:active { transform: translateY(2px); box-shadow: 0 0 0 var(--sk-cer-side), inset 0 1px 2px rgb(30 15 5 / .3); }
+:root[data-style=skeu] .ink-button {
+  border: 1px solid var(--sk-brass-edge);
+  background: linear-gradient(180deg, var(--sk-brass-a), var(--sk-brass-b));
+  color: var(--sk-brass-ink);
+  font-weight: 700;
+  box-shadow: 0 2px 0 var(--sk-brass-edge), inset 0 1px 0 var(--sk-gloss), 0 6px 10px -4px rgb(30 15 5 / .45);
+}
+:root[data-style=skeu] .ink-button:active { transform: translateY(2px); box-shadow: 0 0 0 var(--sk-brass-edge), inset 0 1px 3px rgb(30 15 5 / .35); }
+
+/* La finestra Stile: un foglio dell'agenda. */
+:root[data-style=skeu] .sheet { background: var(--sk-paper); border: 1px solid var(--edge); box-shadow: var(--lift); }
+:root[data-style=skeu] .style-form h2 { font-family: var(--display); }
+:root[data-style=skeu] .style-choice-text small { color: inherit; opacity: .8; }
+:root[data-style=skeu] .style-choice::after { border-color: var(--sk-cer-ink); }
+:root[data-style=skeu] .style-choice:has(input:checked) { border-color: var(--sk-brass-edge); background: linear-gradient(180deg, var(--sk-brass-a), var(--sk-brass-b)); color: var(--sk-brass-ink); }
+:root[data-style=skeu] .style-choice:has(input:checked)::after { border-color: var(--sk-brass-ink); background: var(--sk-brass-ink); box-shadow: inset 0 0 0 3px var(--sk-brass-a); }
+:root[data-style=skeu] .style-choice-swatch { box-shadow: inset 0 0 0 1px var(--sk-cer-edge), inset 0 2px 3px rgb(30 15 5 / .3); }
+:root[data-style=skeu] .legend-icon { border-radius: 50%; box-shadow: inset 0 0 0 1px var(--hairline); }
