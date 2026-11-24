@@ -1,6 +1,6 @@
 # Priority Planner · piano
 
-Stato al 16/11/2026, versione 0.1.2. Tutti i 20 punti della revisione (rev. 3, 09/11/2026) sono approvati.
+Stato al 24/11/2026, versione 0.2.1. Tutti i 20 punti della revisione (rev. 3, 09/11/2026) sono approvati. La roadmap visiva è in `docs/roadmap/` e segue questo piano.
 
 **Adesso:** Fase 1 (T2): modello dati, «Nuova attività», «Tutte le attività» con il filtro.
 
@@ -8,7 +8,7 @@ Stato al 16/11/2026, versione 0.1.2. Tutti i 20 punti della revisione (rev. 3, 0
 
 | Fatto | # | Fase | Cosa vedi funzionare alla fine | Punti | Tempo indicativo |
 |---|---|---|---|---|---|
-| ✅ | T1 | 0 | L'app vuota si installa su tablet e Windows, con 4 stili in chiaro e scuro | D1, D2, D5 | ~2 h |
+| ✅ | T1 | 0 | L'app vuota si installa su tablet e Windows, con 4 stili in chiaro e scuro e l'aggiornamento automatico | D1, D2, D5 | ~2 h |
 | ⬜ | T2 | 1 | Crei attività con area, batterie e vincoli; vedi «Tutte le attività» con il filtro | A1, A2, C1, C3 | ~1,5 h |
 | ⬜ | T3 | 2 | «Il mio ritmo»: pennello, fasce, feste e ferie, ritmi salvati | B1, B2, B3, B6 | ~1,5 h |
 | ⬜ | T4 | 3 | Vista Settimana + «Proponi settimana», con attività lunghe e test | A3, B4, B7, B8 | ~3 h |
@@ -17,12 +17,13 @@ Stato al 16/11/2026, versione 0.1.2. Tutti i 20 punti della revisione (rev. 3, 0
 
 I tempi sono stime del lavoro dell'agente. Ogni fase finisce con un APK provato sul tablet e con l'installer Windows.
 
-Già presente nel codice (Fase 0):
+Già presente nel codice (Fase 0, versioni 0.1.0–0.2.1):
 - Progetto Tauri 2 + Svelte + TypeScript, con `versioni.txt`.
-- I 4 stili (Liquid glass, Neumorfismo, Skeuomorfismo, Claymorphism) con chiaro e scuro e la finestra «Stile» con Applica / Annulla.
-- La settimana corrente vuota, 7 giorni, con le fasce feriali e festive (`src/lib/fasce.ts`).
+- I 4 stili (Liquid glass, Neumorfismo, Skeuomorfismo, Claymorphism) con chiaro e scuro e la finestra «Stile» con Applica / Annulla (`src/lib/aspetto.svelte.ts`).
+- La settimana corrente vuota, 7 giorni, con le fasce feriali e festive (`src/lib/fasce.ts`). Per ora sono festivi solo sabato e domenica: l'elenco «Feste e ferie» arriva in Fase 2.
 - Legenda di batterie e aree, solo icone (`src/lib/energia.ts`).
-- `build-android-alt.ps1`: APK arm64 per il tablet. `build-windows.ps1`: installer NSIS firmato con un certificato autofirmato.
+- Aggiornamento automatico: all'avvio l'app cerca una release nuova su GitHub e mostra «Aggiorna a vX.Y.Z». Su Windows un clic scarica, installa e riavvia (provato da 0.2.0 a 0.2.1); su Android apre il download dell'APK (`src/lib/aggiornamento.svelte.ts`).
+- Build e pubblicazione: `build-android-alt.ps1` (APK arm64), `build-windows.ps1` (installer NSIS con certificato autofirmato e firma dell'updater), `release.ps1` (release GitHub con installer, APK e `latest.json`).
 
 ## L'idea in una riga
 
@@ -71,7 +72,7 @@ flowchart LR
 
 - Per ogni fascia e batteria un livello da 0 a 3, colorato con un pennello: scegli la batteria, clicchi le caselle.
 - Il **totale del giorno** per batteria vale il 40% della somma delle fasce, ed è modificabile a mano.
-- Si salvano più ritmi con un nome (es. «Normale», «Settimana pesante»). Per ogni settimana scegli quale usare. Un ritmo nuovo parte da una copia.
+- Si salvano più ritmi con un nome (es. «Normale», «Settimana pesante»). Per ogni settimana scegli quale usare. Un ritmo nuovo parte da una copia di uno esistente.
 
 ## Il bottone «Proponi settimana» (B4, B7, B8)
 
@@ -117,10 +118,10 @@ A fine settimana (B8) le attività non fatte e quelle in «Non ci sta» tornano 
 
 | Stile | In questa app |
 |---|---|
-| Liquid glass (di partenza) | Pannelli di vetro su uno sfondo di luce sfumata |
+| Liquid glass (di partenza) | Pannelli di vetro su uno sfondo di luce sfumata; le icone della legenda sono gocce d'acqua colorata |
 | Neumorfismo | Fasce incavate, carte in rilievo, superficie unica senza bordi |
-| Skeuomorfismo | Agenda di carta con copertina in pelle, cartellini, bottoni in ceramica e ottone |
-| Claymorphism | Carte e bottoni gonfi e opachi, come argilla, al massimo su due livelli |
+| Skeuomorfismo | Copertina in pelle cucita; la settimana è una pagina d'agenda di carta con doppio margine rosso, rilegatura tra venerdì e sabato, orari a matita; bottoni in ceramica e ottone |
+| Claymorphism | Pasta da modellare: sfondo azzurro pastello, riquadri giallo burro, accenti rosa fragola; forme gonfie e opache, al massimo su due livelli |
 
 ## Tecnica (D1–D4)
 
@@ -129,4 +130,5 @@ A fine settimana (B8) le attività non fatte e quelle in «Non ci sta» tornano 
 - **Pianificatore**: modulo TypeScript separato, con test.
 - **Calendari esterni**: nessuno per ora (D3). Gli impegni fissi si scrivono nell'app.
 - **Sincronizzazione** (D4): «Esporta» crea un `.json` con tutti i dati, la data e il dispositivo. «Importa» mostra le due date, chiede conferma e sostituisce tutto, dopo una copia di sicurezza dei dati attuali.
+- **Aggiornamenti**: release su GitHub (`MrsKugla/PriorityPlanner`), create con `release.ps1`. Non sostituiscono Importa / Esporta: aggiornano l'app, non spostano i dati.
 - **Versioni**: SemVer in `package.json`, `src-tauri/Cargo.toml`, `src-tauri/tauri.conf.json`, con `versioni.txt`.

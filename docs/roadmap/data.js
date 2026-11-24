@@ -3,9 +3,9 @@ window.ROADMAP_DATA = {
   "schemaVersion": 1,
   "meta": {
     "title": "Priority Planner",
-    "subtitle": "roadmap delle fasi · v0.1.2",
+    "subtitle": "roadmap delle fasi · v0.2.1",
     "language": "it",
-    "updated": "2026-11-16 12:00",
+    "updated": "2026-11-24 12:00",
     "sources": [
       "docs/piano-priority-planner.md",
       "docs/revisione-piano-priority-planner.html",
@@ -169,7 +169,8 @@ window.ROADMAP_DATA = {
         "title": "Base pronta (Fase 0)",
         "lines": [
           "4 stili, chiaro/scuro",
-          "APK tablet + installer Windows firmato"
+          "APK tablet + installer Windows firmato",
+          "aggiornamento automatico da GitHub"
         ],
         "status": "done",
         "task": "T1"
@@ -278,11 +279,11 @@ window.ROADMAP_DATA = {
       "icon": "🎨",
       "title": "Fase 0 · base, build e stili",
       "status": "done",
-      "summary": "Progetto Tauri 2 + Svelte + TypeScript con 4 stili e build per tablet e Windows.",
+      "summary": "Progetto Tauri 2 + Svelte + TypeScript con 4 stili, build per tablet e Windows e aggiornamento automatico.",
       "facts": [
-        "v0.1.2",
+        "v0.2.1",
         "4 stili × chiaro/scuro",
-        "~260 righe"
+        "~1170 righe in src/"
       ],
       "doc": "docs/piano-priority-planner.md",
       "steps": [
@@ -323,8 +324,18 @@ window.ROADMAP_DATA = {
             "build-android-alt.ps1, build-windows.ps1."
           ],
           "expected": "apk/PriorityPlanner_X.Y.Z.apk e installer firmato.",
-          "risks": "La notte 0–3:30 si vede solo dal sabato.",
+          "risks": "Installer autofirmato: sui PC nuovi va importato PriorityPlanner-certificato.cer.",
           "note": "APK non ancora provato sul tablet?"
+        },
+        {
+          "name": "Aggiornamento automatico + release",
+          "status": "done",
+          "does": [
+            "All'avvio controlla la release su GitHub; release.ps1 pubblica installer, APK e latest.json."
+          ],
+          "expected": "Provato da v0.2.0 a v0.2.1 su Windows: compare «Aggiorna a v0.2.1», un clic scarica, installa e riavvia. Android (apre il download dell'APK) non ancora provato.",
+          "risks": "La chiave dell'updater sta fuori dalla repo: se si perde, le versioni installate non si aggiornano più.",
+          "note": ""
         }
       ]
     },
@@ -374,7 +385,7 @@ window.ROADMAP_DATA = {
           "name": "«Tutte le attività» + filtro",
           "status": "project",
           "does": [
-            "Elenco con stato, scadenza, ricerca; Tutte · 💼 · 🏡."
+            "Elenco con stato, scadenza, ricerca; Tutte · 💼 · 🏡 (solo visivo: le nascoste occupano la fascia, segno grigio)."
           ],
           "expected": "Esempio: 🏡 nasconde «Report Q4» e mostra «Spesa grande».",
           "risks": "",
@@ -438,7 +449,7 @@ window.ROADMAP_DATA = {
           "name": "Ritmi salvati",
           "status": "project",
           "does": [
-            "«Normale», «Settimana pesante»; uno per settimana."
+            "«Normale», «Settimana pesante»; uno per settimana; un ritmo nuovo parte da una copia."
           ],
           "expected": "Cambi ritmo e la settimana cambia energia.",
           "risks": "",
@@ -473,7 +484,7 @@ window.ROADMAP_DATA = {
           "name": "Pianificatore con test",
           "status": "project",
           "does": [
-            "Orari fissi → scadenza → costo; livello, totale, tempo; max 1 pesante ❤️‍🩹/💬 al giorno."
+            "Orari fissi → scadenza → costo; livello, totale, tempo; max 1 pesante ❤️‍🩹/💬 al giorno (modificabile); tra le fasce valide vince quella con più energia libera, con preferenza al giorno preferito e alternanza delle aree."
           ],
           "expected": "Stessi dati = stessa proposta, provato dai test.",
           "risks": "Regole che si contraddicono: servono casi di test reali.",
@@ -483,7 +494,7 @@ window.ROADMAP_DATA = {
           "name": "Attività lunghe",
           "status": "project",
           "does": [
-            "Fasce consecutive, la pausa interrompe."
+            "Fasce consecutive, la pausa interrompe; livello sufficiente in ogni fascia; costo contato una volta nel totale; più attività brevi nella stessa fascia."
           ],
           "expected": "Esempio: «Report Q4» 2 h → lun 9–10 + «↳» 10–11.",
           "risks": "",
@@ -513,7 +524,7 @@ window.ROADMAP_DATA = {
           "name": "Fine settimana",
           "status": "project",
           "does": [
-            "Non fatte e «Non ci sta» tornano in «Da pianificare»."
+            "Non fatte e «Non ci sta» tornano in «Da pianificare»; l'app non cancella mai niente da sola."
           ],
           "expected": "Contatore neutro, senza rosso.",
           "risks": "",
@@ -557,7 +568,7 @@ window.ROADMAP_DATA = {
           "name": "Giorno no",
           "status": "project",
           "does": [
-            "Livelli di oggi −1, ricalcolo fino a domenica."
+            "Livelli di oggi −1, attività di oggi sbloccate (non quelle a orario fisso), ricalcolo fino a domenica; i giorni passati restano."
           ],
           "expected": "Le attività spostate hanno il bordo giallo; gli orari fissi restano.",
           "risks": "",
@@ -653,8 +664,8 @@ window.ROADMAP_DATA = {
       },
       {
         "id": "c3",
-        "title": "Installare l'APK 0.1.2 sul tablet",
-        "description": "Controllare stili e fasce sullo schermo vero.",
+        "title": "Installare l'APK 0.2.1 sul tablet",
+        "description": "Controllare stili e fasce sullo schermo vero. Dalla 0.2.0 l'app avvisa da sola delle versioni nuove.",
         "column": "test",
         "assignee": "bene",
         "task": "T1",
@@ -759,6 +770,16 @@ window.ROADMAP_DATA = {
         "assignee": "bene",
         "task": "T6",
         "status": "project",
+        "unblocks": ""
+      },
+      {
+        "id": "c14",
+        "title": "Aggiornamento automatico da GitHub",
+        "description": "",
+        "column": "done",
+        "assignee": "agente",
+        "task": "T1",
+        "status": "done",
         "unblocks": ""
       }
     ]
@@ -947,6 +968,14 @@ window.ROADMAP_DATA = {
       "text": "Installer Windows firmato con certificato autofirmato (opzione A).",
       "status": "done",
       "author": "Benedetta"
+    },
+    {
+      "id": "d22",
+      "datetime": "2026-11-17",
+      "task": "T1",
+      "text": "Aggiornamenti dalle release della repo pubblica GitHub, senza passare dal percorso locale; chiave dell'updater solo sul PC di build.",
+      "status": "done",
+      "author": "Benedetta"
     }
   ],
   "lessons": [
@@ -961,6 +990,10 @@ window.ROADMAP_DATA = {
     {
       "id": "L3",
       "text": "Il pacchetto debug riscrive l'APK sul posto: cancellarlo prima evita APK gonfiati."
+    },
+    {
+      "id": "L4",
+      "text": "latest.json e le note della release vanno scritti in UTF-8 senza BOM: Set-Content -Encoding utf8 di PowerShell 5 aggiunge il BOM."
     }
   ],
   "changelog": []
