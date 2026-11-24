@@ -1,11 +1,12 @@
 <script lang="ts">
-  /* «Il mio ritmo» (B1, B2, B3, B6): livelli col pennello, feste e ferie, fasce orarie. */
+  /* «Il mio ritmo» (B1, B2, B3, B6): livelli col pennello, feste e ferie, fasce orarie, regole e Importa / Esporta. */
   import { BATTERIE } from "../lib/energia";
   import {
     aggiungiFesta, archivio, salvaRegole, copiaLunedi, copiaRitmo, eliminaFesta, eliminaRitmo, ripristinaFasce,
     ritmoDellaSettimana, salva, salvaFasce, type BatteriaId,
   } from "../lib/dati.svelte";
   import { chiaveData, etichetta, fasceDellaColonna, leggiFasce, lunedi, totaleAuto, type Fascia } from "../lib/fasce";
+  import Scambio from "./Scambio.svelte";
 
   const COLONNE = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
   const NOTE_COLONNE = ["", "", "", "", "", "anche le feste seguite da un festivo", "anche le feste seguite da un feriale"];
@@ -229,6 +230,7 @@
         <input class="input input-num" type="number" min="0" max="9" value={archivio.dati.regole.maxPesanti} onchange={(e) => salvaRegole({ ...archivio.dati.regole, maxPesanti: Math.max(0, Math.min(9, Math.round(Number(e.currentTarget.value) || 0))) })} />
       </label>
       <p class="muted">Le regole valgono dalla prossima volta che premi «Proponi settimana».</p>
+      <Scambio />
     </div>
   {:else}
     <div class="settings">

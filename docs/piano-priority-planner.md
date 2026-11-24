@@ -1,8 +1,8 @@
 # Priority Planner · piano
 
-Stato al 25/11/2026, versione 0.6.0. Approvati i 20 punti della revisione del piano (rev. 3, 09/11/2026) e i 12 punti delle Fasi 4 e 5 (`docs/revisione-fasi-4-5.html`, rev. 3). La roadmap visiva è in `docs/roadmap/`; la guida tecnica per chi sviluppa è `docs/sviluppo.md`.
+Stato al 25/11/2026, versione 0.7.0. Approvati i 20 punti della revisione del piano (rev. 3, 09/11/2026) e i 12 punti delle Fasi 4 e 5 (`docs/revisione-fasi-4-5.html`, rev. 3). La roadmap visiva è in `docs/roadmap/`; la guida tecnica per chi sviluppa è `docs/sviluppo.md`.
 
-**Adesso:** prova sul tablet delle Fasi 1–4; poi Fase 5 (T6), a partire dal prototipo dei file su Android. Le card con le checklist sono in `TODO.md`.
+**Adesso:** tutte le fasi sono scritte. Resta la prova sul tablet (Fasi 1–5), a partire da Esporta in Download e Drive. Le card con le checklist sono in `TODO.md`, colonna «Da provare sul tablet».
 
 ## Stato del lavoro
 
@@ -13,14 +13,14 @@ Stato al 25/11/2026, versione 0.6.0. Approvati i 20 punti della revisione del pi
 | 🟡 | T3 | 2 | «Il mio ritmo»: pennello, fasce, feste e ferie, ritmi salvati | B1, B2, B3, B6 | ~1,5 h |
 | 🟡 | T4 | 3 | Vista Settimana + «Proponi settimana», con attività lunghe e test | A3, B4, B7, B8 | ~3 h |
 | 🟡 | T5 | 4 | Vista Oggi, check-in, «Giorno no» | B5, C1 | ~1,5 h |
-| ⬜ | T6 | 5 | Prototipo file su Android, poi Importa / Esporta, provato tra tablet e telefono | D4 | ~2 h |
+| 🟡 | T6 | 5 | Importa / Esporta (Kotlin su Android), provato tra tablet e telefono | D4 | ~2 h |
 
-🟡 = scritta (0.3.0–0.6.0), in attesa della prova sul tablet. I tempi sono stime del lavoro dell'agente. Ogni fase finisce con un APK provato sul tablet e con l'installer Windows.
+🟡 = scritta (0.3.0–0.7.0), in attesa della prova sul tablet. I tempi sono stime del lavoro dell'agente. Ogni fase finisce con un APK provato sul tablet e con l'installer Windows.
 
-Già presente nel codice (versioni 0.1.0–0.6.0):
+Già presente nel codice (versioni 0.1.0–0.7.0):
 - Progetto Tauri 2 + Svelte + TypeScript, con `versioni.txt`; 4 stili in chiaro e scuro.
 - Attività con modelli, «Tutte le attività» con filtro, salvataggio in `dati.json`.
-- Il mio ritmo (livelli, feste e ferie, fasce orarie, regole), «Proponi settimana» con test, vista Oggi con check-in e Giorno no.
+- Il mio ritmo (livelli, feste e ferie, fasce orarie, regole), «Proponi settimana» con test, vista Oggi con check-in e Giorno no, Importa / Esporta.
 - Aggiornamento automatico da GitHub e script `build-windows.ps1`, `build-android-alt.ps1`, `release.ps1`.
 
 ## L'idea in una riga
@@ -141,8 +141,8 @@ Decisioni di dettaglio in `docs/revisione-fasi-4-5.html` (A1–A4, rev. 3). Idea
 - **Pianificatore**: modulo TypeScript separato, con test.
 - **Calendari esterni**: nessuno per ora (D3). Gli impegni fissi si scrivono nell'app.
 - **Sincronizzazione** (D4; dettagli C1–C6 in `docs/revisione-fasi-4-5.html`):
-  - **Esporta**: su Windows la finestra «Salva» normale; su Android la finestra «Salva come» di Android, con un comando Kotlin nostro che scrive tramite il `ContentResolver`. I plugin ufficiali `dialog` + `fs` hanno un bug aperto che crea file vuoti ([plugins-workspace #3356](https://github.com/tauri-apps/plugins-workspace/issues/3356)). **Prima della Fase 5 serve un prototipo sul tablet.**
-  - **Importa**: finestra «Apri file» (`dialog`); se la lettura dal plugin non funziona su Android, lo stesso comando Kotlin legge il file.
+  - **Esporta** (in Il mio ritmo › Regole): su Windows la finestra «Salva» normale (`tauri-plugin-dialog`, solo desktop); su Android la finestra «Salva come» di Android, aperta e scritta dal plugin Kotlin `FilePlugin` con il `ContentResolver`. Su Android non si usano i plugin `dialog` + `fs`, che hanno un bug aperto che crea file vuoti ([plugins-workspace #3356](https://github.com/tauri-apps/plugins-workspace/issues/3356)).
+  - **Importa**: finestra «Apri file»; su Android la apre e la legge lo stesso `FilePlugin`. Conferme dentro la pagina, non finestre del sistema.
   - **Nel file**: tutto `dati.json` più `esportato` (data e ora), `dispositivo` e `versioneApp`. Nome proposto `priority-planner_AAAA-MM-GG_dispositivo.json`.
   - **Restano sul dispositivo**: stile, tema, filtro, schermata e il nome del dispositivo, chiesto alla prima esportazione («Tablet», «Telefono», «PC») e modificabile in Il mio ritmo › Regole.
   - **Prima di sostituire**: «Importa» mostra le due date e chiede conferma; salva una sola copia `backup-importazione.json` accanto a `dati.json`; il bottone «Torna ai dati prima dell'ultima importazione» la rimette, con conferma.

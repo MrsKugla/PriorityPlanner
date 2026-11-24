@@ -1,3 +1,9 @@
+0.7.0 - [25/11/2026]
+    - Fase 5: Esporta salva un file con tutte le attività, i ritmi e le regole, più data, nome del dispositivo e versione; su Android usa «Salva come» con un comando Kotlin che scrive il file scelto, così Download e Drive ricevono il contenuto completo (file: src/lib/scambio.svelte.ts, src-tauri/gen/android/app/src/main/java/it/priorityplanner/app/FilePlugin.kt)
+    - Importa apre un file, mostra le due date e chiede conferma prima di sostituire tutto; un file da una versione più nuova dell'app viene rifiutato (file: src/components/Scambio.svelte)
+    - Prima di ogni importazione una copia dei dati attuali; bottone «Torna ai dati prima dell'ultima importazione» con conferma (file: src-tauri/src/lib.rs)
+    - Nome del dispositivo, Esporta e Importa in Il mio ritmo › Regole; stile, tema e filtro restano su ogni dispositivo
+
 0.6.0 - [25/11/2026]
     - Fase 4: nuova schermata «Oggi» con «Adesso» e «Dopo» in grande, «tra N min», «Pausa», «Per oggi basta» con le attività fatte e bottone «Fatta»; segue il filtro 💼 / 🏡 (file: src/components/Oggi.svelte)
     - Check-in 🙂 😐 😣 sempre modificabile in cima a Oggi: abbassa l'energia solo di quel giorno, senza toccare il ritmo, e ricalcola da adesso a domenica; il Giorno no sblocca le attività di oggi non ancora iniziate, tornare a 🙂 ricalcola di nuovo (file: src/lib/dati.svelte.ts)

@@ -471,6 +471,14 @@ button:disabled { opacity: .38; cursor: default; }
 :root[data-style=neu] .today-card:not(.proposed) { border: 0; box-shadow: var(--n-raise-xs); }
 :root[data-style=clay] .today-card:not(.proposed) { border: 0; box-shadow: var(--c-clay-bead, var(--c-clay-pressed)); }
 
+/* ---------- Fase 5: Importa / Esporta ---------- */
+.exchange { display: grid; gap: 12px; margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--came); }
+.exchange p { margin: 0; }
+.exchange .input { max-width: 320px; }
+.exchange-actions { justify-content: flex-start; }
+.exchange-confirm { display: grid; gap: 8px; padding: 14px 16px; border: 1px solid var(--hairline); border-radius: var(--radius-slot); background: var(--glass-strong); }
+.exchange-back { justify-self: start; }
+
 /* ---------- Fase 2: ritmo, feste, fasce ---------- */
 .head-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; }
 .party { margin-left: auto; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 10px; background: none; font-size: 17px; opacity: .3; filter: grayscale(1); cursor: pointer; transition: opacity .2s var(--ease-out), filter .2s var(--ease-out); }
