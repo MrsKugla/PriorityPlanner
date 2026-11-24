@@ -1,3 +1,10 @@
+0.3.0 - [24/11/2026]
+    - Fase 1: nuova attività con titolo, area, durata, 5 costi a icone, scadenza, giorno preferito e orario fisso; modifica, eliminazione e modelli salvati (file: src/components/AttivitaDialog.svelte, src/lib/dati.svelte.ts)
+    - Schermata «Tutte le attività» con stato, scadenza, ricerca, ordinamento, spunta «fatta» e filtro Tutte · 💼 · 🏡 ricordato tra un avvio e l'altro (file: src/components/TutteAttivita.svelte, src/components/FiltroAree.svelte, src/lib/vista.svelte.ts)
+    - Le attività si salvano in un file dati.json sul dispositivo, scritto in modo sicuro; un file illeggibile non viene mai sovrascritto (file: src-tauri/src/lib.rs)
+    - La settimana mostra quante attività sono da pianificare; barra con le schermate Settimana / Tutte le attività e bottone «Nuova» (file: src/App.svelte, src/components/Settimana.svelte, src/styles/base.css)
+    - Piano e roadmap allineati alla 0.2.1 e nuovo TODO.md a kanban con la checklist di ogni fase (file: TODO.md, docs/piano-priority-planner.md, docs/roadmap/data.js)
+
 0.2.1 - [17/11/2026]
     - Skeuomorfismo: la settimana diventa una pagina d'agenda di carta, con bordi ingialliti, doppio margine rosso, piega della rilegatura tra venerdì e sabato, orari in corsivo a matita, numero di oggi ripassato con l'evidenziatore e nastro adesivo «oggi» (file: src/styles/skeuomorphism.css)
 

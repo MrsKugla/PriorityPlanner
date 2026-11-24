@@ -1,5 +1,7 @@
 <script lang="ts">
   import { BATTERIE, AREE } from "../lib/energia";
+  import { archivio } from "../lib/dati.svelte";
+  import { passaFiltro, vista } from "../lib/vista.svelte";
   import { fasceDelGiorno, etichetta, ora, festivo, lunedi } from "../lib/fasce";
 
   const oggi = new Date();
@@ -18,12 +20,20 @@
     inizio.getMonth() === fine.getMonth()
       ? `${inizio.getDate()}–${fine.getDate()} ${nomeMese.format(fine)}`
       : `${inizio.getDate()} ${nomeMese.format(inizio)} – ${fine.getDate()} ${nomeMese.format(fine)}`;
+
+  const daPianificare = $derived(archivio.dati.attivita.filter((a) => a.stato === "da-pianificare" && passaFiltro(a, vista.filtro)).length);
 </script>
 
 <section class="week" aria-labelledby="week-title">
   <header class="pane-head">
     <h1 id="week-title">Settimana {titolo}</h1>
-    <p class="week-empty">Ancora nessuna attività in questa settimana.</p>
+    <p class="week-empty">
+      {#if daPianificare}
+        <button type="button" class="link-button" onclick={() => (vista.schermata = "tutte")}>{daPianificare} da pianificare</button>
+      {:else}
+        Ancora nessuna attività in questa settimana.
+      {/if}
+    </p>
   </header>
 
   <div class="week-grid">

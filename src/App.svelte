@@ -1,14 +1,20 @@
 <script lang="ts">
   import Settimana from "./components/Settimana.svelte";
+  import TutteAttivita from "./components/TutteAttivita.svelte";
+  import AttivitaDialog from "./components/AttivitaDialog.svelte";
   import StileDialog from "./components/StileDialog.svelte";
   import Icona from "./components/Icona.svelte";
   import Aggiornamento from "./components/Aggiornamento.svelte";
   import { aspetto, applica, STILI } from "./lib/aspetto.svelte";
   import { controllaAggiornamenti } from "./lib/aggiornamento.svelte";
+  import { archivio, carica } from "./lib/dati.svelte";
+  import { vista } from "./lib/vista.svelte";
 
+  carica();
   controllaAggiornamenti();
 
   let stile: StileDialog;
+  let attivita: AttivitaDialog;
 
   function cambiaTema(): void {
     aspetto.tema = aspetto.tema === "dark" ? "light" : "dark";
@@ -25,8 +31,16 @@
       <span>Priority Planner</span>
       <small class="version">v{__APP_VERSION__}</small>
     </div>
+    <nav class="seg nav" aria-label="Schermate">
+      <label class="seg-item"><input type="radio" name="schermata" value="settimana" bind:group={vista.schermata} /><span>Settimana</span></label>
+      <label class="seg-item"><input type="radio" name="schermata" value="tutte" bind:group={vista.schermata} /><span>Tutte le attività</span></label>
+    </nav>
     <div class="bar-actions">
       <Aggiornamento />
+      <button class="ink-button new-task" type="button" onclick={() => attivita.apri()} disabled={archivio.fase !== "pronto"} aria-haspopup="dialog" title="Nuova attività">
+        <Icona nome="piu" />
+        <span>Nuova</span>
+      </button>
       <button class="icon-button" type="button" onclick={cambiaTema} aria-label={aspetto.tema === "dark" ? "Passa al tema chiaro" : "Passa al tema scuro"} title={aspetto.tema === "dark" ? "Tema chiaro" : "Tema scuro"}>
         <Icona nome={aspetto.tema === "dark" ? "sole" : "luna"} />
       </button>
@@ -37,9 +51,21 @@
     </div>
   </header>
 
+  {#if archivio.errore}
+    <p class="notice" role="alert">
+      {archivio.fase === "errore" ? "Non riesco a leggere i dati salvati, quindi non li modifico." : ""}
+      {archivio.errore}
+    </p>
+  {/if}
+
   <main class="pane glass">
-    <Settimana />
+    {#if vista.schermata === "tutte"}
+      <TutteAttivita onApri={(a) => attivita.apri(a)} />
+    {:else}
+      <Settimana />
+    {/if}
   </main>
 </div>
 
+<AttivitaDialog bind:this={attivita} />
 <StileDialog bind:this={stile} />
