@@ -2,7 +2,11 @@
    (comandi Rust leggi_dati / scrivi_dati); nel browser di sviluppo in localStorage. */
 import { invoke, isTauri } from "@tauri-apps/api/core";
 import type { Area, Batteria } from "./energia";
-import { FASCE_FERIALI, FASCE_FESTIVE, type Calendario, type Fascia, type Festa } from "./fasce";
+import {
+  chiaveData, colonnaRitmo, FASCE_FERIALI, FASCE_FESTIVE, fasceDelGiorno, fasceDellaColonna, totaleAuto,
+  type Calendario, type Fascia, type Festa,
+} from "./fasce";
+import { proponi, type GiornoPiano } from "./pianificatore";
 
 export type BatteriaId = Batteria["id"];
 export type AreaId = Area["id"];
@@ -31,6 +35,29 @@ export interface Attivita {
   giornoPreferito: number | null;
   stato: StatoAttivita;
   creata: string;
+  /** Dove sta nella settimana; null = da pianificare o non ci sta. */
+  posto: Posto | null;
+  /** Perché non ci sta (es. «gio–ven: 💪 finita»); null altrimenti. */
+  motivo: string | null;
+}
+
+/** Il posto di un'attività in un giorno. Minuti dalla mezzanotte di `data` (≥ 1440 = dopo mezzanotte). */
+export interface Posto {
+  data: string;
+  inizio: number;
+  fine: number;
+  /** true = confermata o spostata a mano (bordo pieno, 🔒); false = proposta (tratteggiata). */
+  bloccato: boolean;
+  /** «Perché qui» in una riga. */
+  perche: string;
+}
+
+/** Regole del bottone (A3, B4). */
+export interface Regole {
+  /** Minuti liberi dopo un'attività con un costo 3: 0, 15 o 30. */
+  cuscinetto: number;
+  /** Massimo di attività pesanti emotive o sociali al giorno. */
+  maxPesanti: number;
 }
 
 /** Un modello compila i campi di una nuova attività (es. «Telefonata medico»). */
@@ -61,6 +88,9 @@ export interface Dati extends Calendario {
   ritmi: Ritmo[];
   /** Lunedì della settimana (AAAA-MM-GG) → id del ritmo scelto; assente = il primo ritmo. */
   settimane: Record<string, string>;
+  regole: Regole;
+  /** Lunedì dell'ultima settimana aperta: serve a riportare le attività non fatte (B8). */
+  ultimaSettimana: string;
 }
 
 export const FORMATO = 1;
@@ -73,22 +103,24 @@ export const costiZero = (): Costi => ({ mentale: 0, emotiva: 0, sociale: 0, sen
 export const nuovoId = (): string => crypto.randomUUID();
 const costiUguali = (n: number): Costi => ({ mentale: n, emotiva: n, sociale: n, sensoriale: n, fisica: n });
 
-/* Un ritmo nuovo parte con tutte le fasce a livello 2: abbastanza per provare il bottone, da colorare poi. */
+/* Un ritmo nuovo parte con tutte le fasce a livello 3: ogni attività può entrare finché non colori dove hai meno energia
+   (con livello 2 ovunque un'attività con un costo 3 non entrerebbe mai). Il totale del giorno limita comunque il carico. */
+const LIVELLO_INIZIALE = 3;
 function ritmoBase(nome: string, cal: Calendario): Ritmo {
   return {
     id: nuovoId(),
     nome,
-    livelli: Array.from({ length: 7 }, (_, c) => (c < 5 ? cal.fasce.feriali : cal.fasce.festive).map(() => costiUguali(2))),
+    livelli: Array.from({ length: 7 }, (_, c) => (c < 5 ? cal.fasce.feriali : cal.fasce.festive).map(() => costiUguali(LIVELLO_INIZIALE))),
     totali: Array.from({ length: 7 }, () => ({})),
   };
 }
 
-/* Dopo un cambio delle fasce, ogni colonna ha tante righe quante fasce: si tengono le prime, le nuove partono da 2. */
+/* Dopo un cambio delle fasce, ogni colonna ha tante righe quante fasce: si tengono le prime, le nuove partono dal livello iniziale. */
 function adattaRitmo(r: Ritmo, cal: Calendario): void {
   for (let c = 0; c < 7; c++) {
     const n = (c < 5 ? cal.fasce.feriali : cal.fasce.festive).length;
     const col = (r.livelli[c] ?? []).slice(0, n);
-    while (col.length < n) col.push(costiUguali(2));
+    while (col.length < n) col.push(costiUguali(LIVELLO_INIZIALE));
     r.livelli[c] = col;
     r.totali[c] ??= {};
   }
@@ -98,7 +130,10 @@ function adattaRitmo(r: Ritmo, cal: Calendario): void {
 
 function vuoti(): Dati {
   const cal: Calendario = { fasce: { feriali: [...FASCE_FERIALI], festive: [...FASCE_FESTIVE] }, feste: [] };
-  return { formato: FORMATO, aggiornato: new Date().toISOString(), attivita: [], modelli: [], ...cal, ritmi: [ritmoBase("Normale", cal)], settimane: {} };
+  return {
+    formato: FORMATO, aggiornato: new Date().toISOString(), attivita: [], modelli: [], ...cal,
+    ritmi: [ritmoBase("Normale", cal)], settimane: {}, regole: { ...REGOLE_PREDEFINITE }, ultimaSettimana: "",
+  };
 }
 
 /* Controlla e ripulisce un file letto dal disco: un campo strano diventa il suo valore neutro, invece di rompere l'app. */
@@ -111,6 +146,20 @@ function costi(c: unknown): Costi {
 }
 const area = (a: unknown): AreaId => (AREE_VALIDE.includes(a as AreaId) ? (a as AreaId) : "me");
 const durata = (d: unknown): number => (typeof d === "number" && d >= 5 ? Math.round(d) : 30);
+export const REGOLE_PREDEFINITE: Regole = { cuscinetto: 15, maxPesanti: 1 };
+function leggiRegole(r: unknown): Regole {
+  const g = (r ?? {}) as Record<string, unknown>;
+  return {
+    cuscinetto: g.cuscinetto === 0 || g.cuscinetto === 15 || g.cuscinetto === 30 ? g.cuscinetto : REGOLE_PREDEFINITE.cuscinetto,
+    maxPesanti: typeof g.maxPesanti === "number" && g.maxPesanti >= 0 && g.maxPesanti <= 9 ? Math.round(g.maxPesanti) : REGOLE_PREDEFINITE.maxPesanti,
+  };
+}
+function leggiPosto(p: unknown): Posto | null {
+  const g = p as Record<string, unknown> | null;
+  const giorno = g ? data(g.data) : null;
+  if (!g || !giorno || typeof g.inizio !== "number" || typeof g.fine !== "number" || g.fine <= g.inizio) return null;
+  return { data: giorno, inizio: g.inizio, fine: g.fine, bloccato: g.bloccato === true, perche: typeof g.perche === "string" ? g.perche : "" };
+}
 
 export function leggiDati(testo: string): Dati {
   const grezzi = JSON.parse(testo) as Record<string, unknown>;
@@ -129,6 +178,8 @@ export function leggiDati(testo: string): Dati {
       giornoPreferito: typeof g.giornoPreferito === "number" && g.giornoPreferito >= 0 && g.giornoPreferito <= 6 ? g.giornoPreferito : null,
       stato: STATI_VALIDI.includes(g.stato as StatoAttivita) ? (g.stato as StatoAttivita) : "da-pianificare",
       creata: typeof g.creata === "string" ? g.creata : new Date().toISOString(),
+      posto: leggiPosto(g.posto),
+      motivo: typeof g.motivo === "string" ? g.motivo : null,
     };
   });
   const modelli = (Array.isArray(grezzi.modelli) ? grezzi.modelli : []).map((g: Record<string, unknown>): Modello => ({
@@ -182,6 +233,8 @@ export function leggiDati(testo: string): Dati {
     ...cal,
     ritmi: ritmi.length ? ritmi : [ritmoBase("Normale", cal)],
     settimane,
+    regole: leggiRegole(grezzi.regole),
+    ultimaSettimana: data(grezzi.ultimaSettimana) ?? "",
   };
 }
 
@@ -242,7 +295,7 @@ export function eliminaAttivita(id: string): void {
 export function segnaFatta(id: string, fatta: boolean): void {
   const a = archivio.dati.attivita.find((x) => x.id === id);
   if (!a) return;
-  a.stato = fatta ? "fatta" : "da-pianificare";
+  a.stato = fatta ? "fatta" : a.posto ? "in-settimana" : "da-pianificare";
   salva();
 }
 
@@ -316,4 +369,101 @@ export function aggiungiFesta(dal: string, al: string, nome: string): void {
 export function eliminaFesta(id: string): void {
   archivio.dati.feste = archivio.dati.feste.filter((f) => f.id !== id);
   salva();
+}
+
+/* ---------- Settimana e «Proponi settimana» (B4, B5, B8) ---------- */
+
+/** Prepara i giorni per il pianificatore: fasce del giorno, livelli e totale dalla colonna del ritmo della settimana. */
+export function giorniPiano(giorni: readonly Date[], ritmo: Ritmo): GiornoPiano[] {
+  const d = archivio.dati;
+  return giorni.map((g) => {
+    const fasce = fasceDelGiorno(g, d);
+    const c = colonnaRitmo(g, d);
+    const livelli = fasce.map((_, i) => ({ ...ritmo.livelli[c][i] }));
+    const visibili = fasceDellaColonna(c, d).map((_, i) => ritmo.livelli[c][i]);
+    const totale = costiZero();
+    for (const b of BATTERIE_IDS) totale[b] = ritmo.totali[c][b] ?? totaleAuto(visibili.map((x) => x[b]));
+    return { chiave: chiaveData(g), fasce, livelli, totale };
+  });
+}
+
+/** Applica la proposta da `daGiorno` (oggi) a domenica; restituisce quante attività non ci stanno. */
+export function proponiSettimana(giorni: readonly Date[], daGiorno: number, ritmo: Ritmo): number {
+  const esiti = proponi(giorniPiano(giorni, ritmo), daGiorno, $state.snapshot(archivio.dati.attivita) as Attivita[], archivio.dati.regole);
+  let fuori = 0;
+  for (const a of archivio.dati.attivita) {
+    const e = esiti.get(a.id);
+    if (!e) continue;
+    if (e.tipo === "posto") {
+      a.posto = { data: e.data, inizio: e.inizio, fine: e.fine, bloccato: e.bloccato, perche: e.perche };
+      a.stato = "in-settimana";
+      a.motivo = null;
+    } else {
+      a.posto = null;
+      a.stato = "non-ci-sta";
+      a.motivo = e.motivo;
+      fuori++;
+    }
+  }
+  salva();
+  return fuori;
+}
+
+/** «Accetta tutte»: blocca le proposte di questi giorni. */
+export function bloccaTutte(chiavi: readonly string[]): void {
+  for (const a of archivio.dati.attivita) if (a.posto && chiavi.includes(a.posto.data)) a.posto.bloccato = true;
+  salva();
+}
+
+export function cambiaBlocco(id: string): void {
+  const a = archivio.dati.attivita.find((x) => x.id === id);
+  if (!a?.posto) return;
+  a.posto.bloccato = !a.posto.bloccato;
+  salva();
+}
+
+/** Spostata a mano: resta lì (bloccata) anche con una nuova proposta. */
+export function sposta(id: string, data: string, inizio: number): void {
+  const a = archivio.dati.attivita.find((x) => x.id === id);
+  if (!a) return;
+  a.posto = { data, inizio, fine: inizio + a.durata, bloccato: true, perche: "messa qui da te" };
+  if (a.stato !== "fatta") a.stato = "in-settimana";
+  a.motivo = null;
+  salva();
+}
+
+export function togliDallaSettimana(id: string): void {
+  const a = archivio.dati.attivita.find((x) => x.id === id);
+  if (!a) return;
+  a.posto = null;
+  a.motivo = null;
+  a.stato = "da-pianificare";
+  salva();
+}
+
+export function salvaRegole(r: Regole): void {
+  archivio.dati.regole = r;
+  salva();
+}
+
+/** Fine settimana (B8): le non fatte delle settimane passate e quelle in «Non ci sta» tornano da pianificare.
+    L'app non cancella niente. Restituisce quante attività sono tornate. */
+export function apriSettimana(lunediChiave: string): number {
+  const d = archivio.dati;
+  if (d.ultimaSettimana === lunediChiave) return 0;
+  let tornate = 0;
+  for (const a of d.attivita) {
+    if (a.stato === "fatta") continue;
+    const passata = a.posto && a.posto.data < lunediChiave;
+    if (passata || a.stato === "non-ci-sta") {
+      a.posto = null;
+      a.motivo = null;
+      a.stato = "da-pianificare";
+      tornate++;
+    }
+  }
+  const primaVolta = !d.ultimaSettimana;
+  d.ultimaSettimana = lunediChiave;
+  salva();
+  return primaVolta ? 0 : tornate;
 }

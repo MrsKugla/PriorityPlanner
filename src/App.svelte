@@ -8,10 +8,13 @@
   import Aggiornamento from "./components/Aggiornamento.svelte";
   import { aspetto, applica, STILI } from "./lib/aspetto.svelte";
   import { controllaAggiornamenti } from "./lib/aggiornamento.svelte";
-  import { archivio, carica } from "./lib/dati.svelte";
+  import { apriSettimana, archivio, carica } from "./lib/dati.svelte";
+  import { chiaveData, lunedi } from "./lib/fasce";
   import { vista } from "./lib/vista.svelte";
 
-  carica();
+  carica().then(() => {
+    if (archivio.fase === "pronto") vista.tornate = apriSettimana(chiaveData(lunedi(new Date())));
+  });
   controllaAggiornamenti();
 
   let stile: StileDialog;
@@ -66,7 +69,7 @@
     {:else if vista.schermata === "tutte"}
       <TutteAttivita onApri={(a) => attivita.apri(a)} />
     {:else}
-      <Settimana />
+      <Settimana onApri={(a) => attivita.apri(a)} />
     {/if}
   </main>
 </div>

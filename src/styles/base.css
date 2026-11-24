@@ -257,8 +257,11 @@ button:disabled { opacity: .38; cursor: default; }
 .today-chip { align-self: center; margin-left: auto; padding: 2px 9px; border-radius: 999px; background: var(--signal); color: var(--on-signal); font-size: 12px; font-weight: 700; }
 .slots { display: flex; flex-direction: column; gap: 5px; margin: 0; padding: 0; list-style: none; }
 .slot {
-  height: calc(var(--span) * var(--hour));
-  min-height: var(--hour);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: calc(var(--span) * var(--hour));
   padding: 5px 9px;
   border: 1px solid var(--hairline);
   border-radius: var(--radius-slot);
@@ -412,6 +415,42 @@ button:disabled { opacity: .38; cursor: default; }
 :root[data-style=skeu] .seg-item:has(input:checked) { background: linear-gradient(180deg, var(--sk-cer-a), var(--sk-cer-b)); color: var(--sk-cer-ink); }
 :root[data-style=skeu] .task-list .task-title, :root[data-style=skeu] .task-form h2 { font-family: var(--display); }
 :root[data-style=skeu] .task-row { border-bottom-color: var(--sk-rule); }
+
+/* ---------- Fase 3: settimana con le proposte ---------- */
+.week-body { flex: 1; min-height: 0; display: flex; }
+.week-body .week-grid { min-width: 0; }
+.tray { width: 230px; flex: none; overflow: auto; overscroll-behavior: contain; padding: 4px 4px 16px 20px; border-right: 1px solid var(--came); }
+.tray h2 { display: flex; justify-content: space-between; margin: 12px 8px 8px 0; font-size: 14px; font-weight: 700; }
+.tray ul { display: grid; gap: 6px; margin: 0; padding: 0 8px 0 0; list-style: none; }
+.tray-empty { padding: 4px 0; font-size: 13.5px; }
+.tray-card { width: 100%; display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 10px; border: 1px solid var(--hairline); border-radius: var(--radius-slot); background: var(--glass-strong); color: var(--ink); font: inherit; font-size: 14px; text-align: left; cursor: pointer; }
+.tray-card small { display: block; margin-top: 2px; color: var(--muted); font-size: 12px; line-height: 1.3; }
+.picked { outline: 3px solid var(--signal); outline-offset: 1px; }
+.pick-bar, .week-note { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin: 0; padding: 8px 24px 8px 26px; border-bottom: 1px solid var(--came); font-size: 14px; }
+.pick-bar .text-button { min-height: 40px; }
+.pick-title { font-weight: 700; }
+.week-note { color: var(--muted); }
+.past .slot { opacity: .62; }
+.slot-drop { position: absolute; inset: 0; z-index: 2; border: 2px dashed color-mix(in srgb, var(--signal) 70%, transparent); border-radius: inherit; background: color-mix(in srgb, var(--signal) 8%, transparent); cursor: copy; }
+.slot-drop:hover, .slot-drop:focus-visible { background: color-mix(in srgb, var(--signal) 22%, transparent); outline: none; }
+.card { display: grid; gap: 2px; width: 100%; padding: 6px 8px; border: 1.5px solid color-mix(in srgb, var(--tone) 55%, var(--hairline)); border-radius: calc(var(--radius-slot) + 2px); background: color-mix(in srgb, var(--tone) 16%, var(--glass-strong)); color: var(--ink); font: inherit; text-align: left; cursor: pointer; transition: transform .3s var(--ease-press); }
+.card:active { transform: scale(.97); }
+.card.proposed { border-style: dashed; background: color-mix(in srgb, var(--tone) 8%, transparent); }
+.card.done .card-title { text-decoration: line-through; color: var(--muted); }
+.card-top { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.card-area { font-size: 14px; }
+.card-title { flex: 1; min-width: 0; overflow: hidden; font-size: 13.5px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.card-lock { font-size: 11px; }
+.card-why { overflow: hidden; color: var(--muted); font-size: 11.5px; text-overflow: ellipsis; white-space: nowrap; }
+.card-cont { color: var(--muted); font-size: 12px; font-style: italic; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hidden-mark { display: block; height: 8px; border-radius: 4px; background: color-mix(in srgb, var(--muted) 35%, transparent); }
+:root[data-style=skeu] .card { border-radius: 2px; box-shadow: 0 1px 2px rgb(30 15 5 / .2); font-family: var(--display); }
+:root[data-style=neu] .card:not(.proposed) { border: 0; box-shadow: var(--n-raise-xs); }
+:root[data-style=clay] .card:not(.proposed) { border: 0; box-shadow: var(--c-clay-bead, var(--c-clay-pressed)); }
+@media (max-width: 900px) {
+  .week-body { flex-direction: column; }
+  .tray { width: auto; max-height: 30%; border-right: 0; border-bottom: 1px solid var(--came); padding-left: 16px; }
+}
 
 /* ---------- Fase 2: ritmo, feste, fasce ---------- */
 .head-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; }

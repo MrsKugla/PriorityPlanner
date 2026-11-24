@@ -61,6 +61,15 @@
   function conferma(evento: SubmitEvent): void {
     evento.preventDefault();
     const [h, m] = fissoOra.split(":").map(Number);
+    const orarioFisso = fisso && fissoData ? { data: fissoData, inizio: h * 60 + m } : null;
+    /* Un orario fisso decide il posto; altrimenti resta quello di prima, con la nuova durata. */
+    const vecchio = originale?.posto ?? null;
+    const posto = orarioFisso
+      ? { data: orarioFisso.data, inizio: orarioFisso.inizio, fine: orarioFisso.inizio + durata, bloccato: true, perche: "orario fisso" }
+      : vecchio && !originale?.orarioFisso
+        ? { ...vecchio, fine: vecchio.inizio + durata }
+        : null;
+    const stato = originale?.stato === "fatta" ? "fatta" : posto ? "in-settimana" : originale?.stato === "non-ci-sta" ? "non-ci-sta" : "da-pianificare";
     salvaAttivita({
       id: originale?.id ?? nuovoId(),
       titolo: titolo.trim(),
@@ -68,10 +77,12 @@
       costi: { ...costi },
       durata,
       scadenza: scadenza || null,
-      orarioFisso: fisso && fissoData ? { data: fissoData, inizio: h * 60 + m } : null,
+      orarioFisso,
       giornoPreferito: giornoPreferito === "" ? null : Number(giornoPreferito),
-      stato: originale?.stato ?? "da-pianificare",
+      stato,
       creata: originale?.creata ?? new Date().toISOString(),
+      posto,
+      motivo: stato === "non-ci-sta" ? (originale?.motivo ?? null) : null,
     });
     if (comeModello) salvaModello({ id: nuovoId(), nome: (nomeModello || titolo).trim(), titolo: titolo.trim(), area, costi: { ...costi }, durata });
     finestra.close();

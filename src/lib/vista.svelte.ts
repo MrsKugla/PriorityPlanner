@@ -19,7 +19,7 @@ function leggi(): { schermata: Schermata; filtro: Filtro } {
   }
 }
 
-export const vista = $state(leggi());
+export const vista = $state({ ...leggi(), tornate: 0 });
 
 $effect.root(() => {
   $effect(() => localStorage.setItem(CHIAVE, JSON.stringify({ schermata: vista.schermata, filtro: vista.filtro })));

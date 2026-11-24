@@ -2,7 +2,7 @@
   /* «Il mio ritmo» (B1, B2, B3, B6): livelli col pennello, feste e ferie, fasce orarie. */
   import { BATTERIE } from "../lib/energia";
   import {
-    aggiungiFesta, archivio, copiaLunedi, copiaRitmo, eliminaFesta, eliminaRitmo, ripristinaFasce,
+    aggiungiFesta, archivio, salvaRegole, copiaLunedi, copiaRitmo, eliminaFesta, eliminaRitmo, ripristinaFasce,
     ritmoDellaSettimana, salva, salvaFasce, type BatteriaId,
   } from "../lib/dati.svelte";
   import { chiaveData, etichetta, fasceDellaColonna, leggiFasce, lunedi, totaleAuto, type Fascia } from "../lib/fasce";
@@ -10,7 +10,7 @@
   const COLONNE = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
   const NOTE_COLONNE = ["", "", "", "", "", "anche le feste seguite da un festivo", "anche le feste seguite da un feriale"];
 
-  let scheda = $state<"livelli" | "feste" | "fasce">("livelli");
+  let scheda = $state<"livelli" | "feste" | "fasce" | "regole">("livelli");
   let ritmoId = $state(ritmoDellaSettimana(chiaveData(lunedi(new Date()))).id);
   let batteria = $state<BatteriaId>("mentale");
   let pennello = $state(3);
@@ -107,6 +107,7 @@
       <label class="seg-item"><input type="radio" name="scheda" value="livelli" bind:group={scheda} /><span>Livelli</span></label>
       <label class="seg-item"><input type="radio" name="scheda" value="feste" bind:group={scheda} /><span>Feste e ferie</span></label>
       <label class="seg-item"><input type="radio" name="scheda" value="fasce" bind:group={scheda} onchange={apriFasce} /><span>Fasce orarie</span></label>
+      <label class="seg-item"><input type="radio" name="scheda" value="regole" bind:group={scheda} /><span>Regole</span></label>
     </div>
   </header>
 
@@ -210,6 +211,25 @@
         <p class="muted">Nessuna festa o ferie segnata. Sabato e domenica sono sempre festivi.</p>
       {/if}
     </div>
+  {:else if scheda === "regole"}
+    <div class="settings">
+      <fieldset class="field">
+        <legend>Cuscinetto dopo un'attività con un costo 3</legend>
+        <div class="seg" role="radiogroup" aria-label="Cuscinetto">
+          {#each [0, 15, 30] as m (m)}
+            <label class="seg-item">
+              <input type="radio" name="cuscinetto" value={m} checked={archivio.dati.regole.cuscinetto === m} onchange={() => salvaRegole({ ...archivio.dati.regole, cuscinetto: m })} />
+              <span>{m ? `${m} min` : "Nessuno"}</span>
+            </label>
+          {/each}
+        </div>
+      </fieldset>
+      <label class="field">
+        <span>Massimo di attività pesanti ❤️‍🩹 o 💬 (costo 3) al giorno</span>
+        <input class="input input-num" type="number" min="0" max="9" value={archivio.dati.regole.maxPesanti} onchange={(e) => salvaRegole({ ...archivio.dati.regole, maxPesanti: Math.max(0, Math.min(9, Math.round(Number(e.currentTarget.value) || 0))) })} />
+      </label>
+      <p class="muted">Le regole valgono dalla prossima volta che premi «Proponi settimana».</p>
+    </div>
   {:else}
     <div class="settings">
       <div class="slot-editors">
@@ -230,7 +250,7 @@
       </div>
       <p class="muted">Un buco tra due fasce è una pausa. Le fasce festive dopo mezzanotte (es. 00:00–03:30) valgono solo se anche il giorno dopo è festivo.</p>
       {#if erroreFasce}<p class="notice" role="alert">{erroreFasce}</p>{/if}
-      {#if fasceSalvate}<p class="muted" role="status">Fasce salvate. I ritmi tengono i livelli delle prime fasce; quelle nuove partono da 2.</p>{/if}
+      {#if fasceSalvate}<p class="muted" role="status">Fasce salvate. I ritmi tengono i livelli delle prime fasce; quelle nuove partono da 3.</p>{/if}
       <div class="dialog-actions">
         <button type="button" class="text-button" onclick={ripristina}>Ripristina le predefinite</button>
         <button type="button" class="ink-button" onclick={salvaLeFasce}>Salva le fasce</button>
