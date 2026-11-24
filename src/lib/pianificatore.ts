@@ -1,6 +1,7 @@
 /* Il bottone «Proponi settimana» (A3, B4, B7). Modulo puro e deterministico: stessi dati = stessa proposta.
 
    1. Occupano il posto per primi: attività fatte o bloccate in settimana, proposte nei giorni passati, orari fissi.
+      Oggi conta l'ora attuale (`adesso`): le proposte già iniziate restano e il tempo prima di adesso non è libero.
    2. Le altre, in ordine: scadenza più vicina, poi costo totale più alto (poi titolo e id, per non dipendere dall'ordine).
    3. Una posizione è valida se: c'è tempo libero (attività lunghe = fasce consecutive vuote, la pausa interrompe),
       ogni fascia occupata ha il livello ≥ costo per ogni batteria, il totale del giorno non si supera
@@ -114,7 +115,10 @@ function riassumi(motivi: { giorno: number; testo: string }[]): string {
 
 const ggmm = (k: string) => `${Number(k.slice(8))}/${Number(k.slice(5, 7))}`;
 
-export function proponi(giorni: readonly GiornoPiano[], daGiorno: number, attivita: readonly Attivita[], regole: Regole): Map<string, Esito> {
+/** `adesso` = minuti dalla mezzanotte nel giorno `daGiorno`; 0 = tutto il giorno è ancora da pianificare. */
+export function proponi(
+  giorni: readonly GiornoPiano[], daGiorno: number, attivita: readonly Attivita[], regole: Regole, adesso = 0,
+): Map<string, Esito> {
   const stato = giorni.map((g) => new Giorno(g));
   const indice = new Map(giorni.map((g, i) => [g.chiave, i]));
   const esiti = new Map<string, Esito>();
@@ -130,7 +134,8 @@ export function proponi(giorni: readonly GiornoPiano[], daGiorno: number, attivi
   const daPianificare: Attivita[] = [];
   for (const a of attivita) {
     const d = a.posto ? indice.get(a.posto.data) : undefined;
-    if (a.posto && d !== undefined && (a.stato === "fatta" || a.posto.bloccato || d < daGiorno)) {
+    const passata = d !== undefined && (d < daGiorno || (d === daGiorno && a.posto!.inizio < adesso));
+    if (a.posto && d !== undefined && (a.stato === "fatta" || a.posto.bloccato || passata)) {
       metti(a, d, a.posto.inizio, a.posto.fine);
       continue;
     }
@@ -145,6 +150,8 @@ export function proponi(giorni: readonly GiornoPiano[], daGiorno: number, attivi
     }
     daPianificare.push(a);
   }
+  // Oggi il tempo prima di adesso è passato.
+  if (adesso > 0 && stato[daGiorno]) stato[daGiorno].occupa(0, adesso);
 
   // 2. Ordine.
   daPianificare.sort(

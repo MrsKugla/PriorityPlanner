@@ -3,22 +3,20 @@
      «Da pianificare» e «Non ci sta». Tocca una carta per sceglierla, poi un comando o una fascia dove spostarla. */
   import { BATTERIE, AREE } from "../lib/energia";
   import {
-    aggiungiFesta, archivio, bloccaTutte, cambiaBlocco, eliminaFesta, proponiSettimana, ritmoDellaSettimana,
+    aggiungiFesta, archivio, bloccaTutte, cambiaBlocco, eliminaFesta, minutiDi, proponiSettimana, ritmoDellaSettimana,
     scegliRitmo, segnaFatta, sposta, togliDallaSettimana, type Attivita,
   } from "../lib/dati.svelte";
   import { formatoDurata, passaFiltro, vista } from "../lib/vista.svelte";
-  import { chiaveData, etichetta, fasceDelGiorno, festaDelGiorno, festivo, indiceSettimana, lunedi, ora, type Fascia } from "../lib/fasce";
+  import {
+    chiaveData, etichetta, fasceDelGiorno, festaDelGiorno, festivo, giorniDellaSettimana, indiceSettimana, lunedi, ora, type Fascia,
+  } from "../lib/fasce";
 
   let { onApri }: { onApri: (a: Attivita) => void } = $props();
 
   const oggi = new Date();
   const inizio = lunedi(oggi);
   const chiaveSettimana = chiaveData(inizio);
-  const giorni = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(inizio);
-    d.setDate(inizio.getDate() + i);
-    return d;
-  });
+  const giorni = giorniDellaSettimana(inizio);
   const chiavi = giorni.map(chiaveData);
   const daGiorno = indiceSettimana(oggi);
 
@@ -51,7 +49,7 @@
   }
 
   function proponi(): void {
-    const fuori = proponiSettimana(giorni, daGiorno, ritmo);
+    const fuori = proponiSettimana(giorni, daGiorno, ritmo, minutiDi(new Date()));
     scelta = null;
     esito = fuori ? `${fuori} non ci ${fuori === 1 ? "sta" : "stanno"}: il motivo è in «Non ci sta».` : "Tutto pianificato.";
   }

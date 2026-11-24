@@ -3,8 +3,8 @@
 import { invoke, isTauri } from "@tauri-apps/api/core";
 import type { Area, Batteria } from "./energia";
 import {
-  chiaveData, colonnaRitmo, FASCE_FERIALI, FASCE_FESTIVE, fasceDelGiorno, fasceDellaColonna, totaleAuto,
-  type Calendario, type Fascia, type Festa,
+  chiaveData, colonnaRitmo, FASCE_FERIALI, FASCE_FESTIVE, fasceDelGiorno, fasceDellaColonna, giorniDellaSettimana, indiceSettimana,
+  lunedi, totaleAuto, type Calendario, type Fascia, type Festa,
 } from "./fasce";
 import { proponi, type GiornoPiano } from "./pianificatore";
 
@@ -13,6 +13,8 @@ export type AreaId = Area["id"];
 /** Costo da 0 a 3 per ogni batteria. */
 export type Costi = Record<BatteriaId, number>;
 export type StatoAttivita = "da-pianificare" | "in-settimana" | "non-ci-sta" | "fatta";
+/** Check-in del giorno (B5, A4): 🙂 bene, 😐 così così, 😣 Giorno no. */
+export type Umore = "bene" | "cosi" | "no";
 
 export interface OrarioFisso {
   /** Giorno in formato AAAA-MM-GG. */
@@ -91,6 +93,10 @@ export interface Dati extends Calendario {
   regole: Regole;
   /** Lunedì dell'ultima settimana aperta: serve a riportare le attività non fatte (B8). */
   ultimaSettimana: string;
+  /** Data → check-in scelto; assente = 🙂. */
+  checkin: Record<string, Umore>;
+  /** Data → quanto scende ogni batteria quel giorno (A1). Il ritmo non cambia. */
+  cali: Record<string, Partial<Costi>>;
 }
 
 export const FORMATO = 1;
@@ -132,7 +138,7 @@ function vuoti(): Dati {
   const cal: Calendario = { fasce: { feriali: [...FASCE_FERIALI], festive: [...FASCE_FESTIVE] }, feste: [] };
   return {
     formato: FORMATO, aggiornato: new Date().toISOString(), attivita: [], modelli: [], ...cal,
-    ritmi: [ritmoBase("Normale", cal)], settimane: {}, regole: { ...REGOLE_PREDEFINITE }, ultimaSettimana: "",
+    ritmi: [ritmoBase("Normale", cal)], settimane: {}, regole: { ...REGOLE_PREDEFINITE }, ultimaSettimana: "", checkin: {}, cali: {},
   };
 }
 
@@ -235,7 +241,30 @@ export function leggiDati(testo: string): Dati {
     settimane,
     regole: leggiRegole(grezzi.regole),
     ultimaSettimana: data(grezzi.ultimaSettimana) ?? "",
+    checkin: leggiCheckin(grezzi.checkin),
+    cali: leggiCali(grezzi.cali),
   };
+}
+
+const UMORI: readonly Umore[] = ["bene", "cosi", "no"];
+function leggiCheckin(c: unknown): Record<string, Umore> {
+  const r: Record<string, Umore> = {};
+  if (c && typeof c === "object") for (const [k, v] of Object.entries(c)) if (data(k) && UMORI.includes(v as Umore)) r[k] = v as Umore;
+  return r;
+}
+function leggiCali(c: unknown): Record<string, Partial<Costi>> {
+  const r: Record<string, Partial<Costi>> = {};
+  if (c && typeof c === "object")
+    for (const [k, v] of Object.entries(c)) {
+      if (!data(k) || !v || typeof v !== "object") continue;
+      const calo: Partial<Costi> = {};
+      for (const b of BATTERIE_IDS) {
+        const n = (v as Record<string, unknown>)[b];
+        if (typeof n === "number" && n > 0) calo[b] = livello(n);
+      }
+      r[k] = calo;
+    }
+  return r;
 }
 
 type Caricamento = "carico" | "pronto" | "errore";
@@ -373,23 +402,35 @@ export function eliminaFesta(id: string): void {
 
 /* ---------- Settimana e «Proponi settimana» (B4, B5, B8) ---------- */
 
-/** Prepara i giorni per il pianificatore: fasce del giorno, livelli e totale dalla colonna del ritmo della settimana. */
+/** Prepara i giorni per il pianificatore: fasce del giorno, livelli e totale dalla colonna del ritmo della settimana,
+    meno il calo di quel giorno (A1), mai sotto 0. */
 export function giorniPiano(giorni: readonly Date[], ritmo: Ritmo): GiornoPiano[] {
   const d = archivio.dati;
   return giorni.map((g) => {
+    const chiave = chiaveData(g);
+    const calo = d.cali[chiave] ?? {};
+    const meno = (x: Costi): Costi => {
+      const r = { ...x };
+      for (const b of BATTERIE_IDS) r[b] = Math.max(0, r[b] - (calo[b] ?? 0));
+      return r;
+    };
     const fasce = fasceDelGiorno(g, d);
     const c = colonnaRitmo(g, d);
-    const livelli = fasce.map((_, i) => ({ ...ritmo.livelli[c][i] }));
+    const livelli = fasce.map((_, i) => meno(ritmo.livelli[c][i]));
     const visibili = fasceDellaColonna(c, d).map((_, i) => ritmo.livelli[c][i]);
     const totale = costiZero();
     for (const b of BATTERIE_IDS) totale[b] = ritmo.totali[c][b] ?? totaleAuto(visibili.map((x) => x[b]));
-    return { chiave: chiaveData(g), fasce, livelli, totale };
+    return { chiave, fasce, livelli, totale: meno(totale) };
   });
 }
 
-/** Applica la proposta da `daGiorno` (oggi) a domenica; restituisce quante attività non ci stanno. */
-export function proponiSettimana(giorni: readonly Date[], daGiorno: number, ritmo: Ritmo): number {
-  const esiti = proponi(giorniPiano(giorni, ritmo), daGiorno, $state.snapshot(archivio.dati.attivita) as Attivita[], archivio.dati.regole);
+/** Minuti dalla mezzanotte. */
+export const minutiDi = (t: Date): number => t.getHours() * 60 + t.getMinutes();
+
+/** Applica la proposta da `daGiorno` (oggi) a domenica; oggi il tempo libero parte da `adesso` (minuti).
+    Restituisce quante attività non ci stanno. */
+export function proponiSettimana(giorni: readonly Date[], daGiorno: number, ritmo: Ritmo, adesso = 0): number {
+  const esiti = proponi(giorniPiano(giorni, ritmo), daGiorno, $state.snapshot(archivio.dati.attivita) as Attivita[], archivio.dati.regole, adesso);
   let fuori = 0;
   for (const a of archivio.dati.attivita) {
     const e = esiti.get(a.id);
@@ -407,6 +448,39 @@ export function proponiSettimana(giorni: readonly Date[], daGiorno: number, ritm
   }
   salva();
   return fuori;
+}
+
+/* ---------- Check-in e Giorno no (B5, A1–A4) ---------- */
+
+const CALI: Record<Umore, Partial<Costi>> = {
+  bene: {},
+  cosi: { mentale: 1, emotiva: 1 },
+  no: { mentale: 1, emotiva: 1, sociale: 1, sensoriale: 1, fisica: 1 },
+};
+
+export const umoreDi = (chiave: string): Umore => archivio.dati.checkin[chiave] ?? "bene";
+
+/** Cambia il check-in di oggi e ricalcola da adesso a domenica. Entrando in 😣 o uscendone si sbloccano
+    le attività di oggi non ancora iniziate (non gli orari fissi); altrimenti si ricalcolano solo le proposte.
+    Restituisce quante attività non ci stanno, o -1 se non è cambiato niente. */
+export function cambiaCheckin(umore: Umore, ora = new Date()): number {
+  const d = archivio.dati;
+  const chiave = chiaveData(ora);
+  const prima = umoreDi(chiave);
+  if (prima === umore) return -1;
+  const adesso = minutiDi(ora);
+  if (umore === "bene") {
+    delete d.checkin[chiave];
+    delete d.cali[chiave];
+  } else {
+    d.checkin[chiave] = umore;
+    d.cali[chiave] = { ...CALI[umore] };
+  }
+  if (prima === "no" || umore === "no")
+    for (const a of d.attivita)
+      if (a.posto?.data === chiave && a.stato !== "fatta" && !a.orarioFisso && a.posto.inizio >= adesso) a.posto.bloccato = false;
+  const lun = lunedi(ora);
+  return proponiSettimana(giorniDellaSettimana(lun), indiceSettimana(ora), ritmoDellaSettimana(chiaveData(lun)), adesso);
 }
 
 /** «Accetta tutte»: blocca le proposte di questi giorni. */

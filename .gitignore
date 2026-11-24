@@ -16,3 +16,6 @@ script-buttons.json
 # Note di revisione con frasi personali.
 revisione-piano-priority-planner.html
 TODO.md
+docs/sviluppo.md
+docs/revisione-*.html
+AGENTS.md

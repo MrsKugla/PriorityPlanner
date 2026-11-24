@@ -79,6 +79,19 @@ describe("proponi", () => {
     expect(nuova?.tipo === "posto" && nuova.data >= "2026-11-25").toBe(true);
   });
 
+  it("oggi il tempo libero parte da adesso: niente prima dell'ora attuale", () => {
+    const e = proponi(settimana(), 2, [att({ id: "ora", durata: 30, giornoPreferito: 2 })], REGOLE, 630);
+    expect(e.get("ora")).toMatchObject({ tipo: "posto", data: "2026-11-25", inizio: 630 });
+  });
+
+  it("con adesso, le proposte già iniziate restano; quelle che devono ancora arrivare si ricalcolano", () => {
+    const proposta = (id: string, inizio: number) =>
+      att({ id, stato: "in-settimana", posto: { data: "2026-11-25", inizio, fine: inizio + 60, bloccato: false, perche: "" } });
+    const e = proponi(settimana(), 2, [proposta("iniziata", 540), proposta("futura", 840)], REGOLE, 570);
+    expect(e.has("iniziata")).toBe(false);
+    expect(e.get("futura")).toMatchObject({ tipo: "posto" });
+  });
+
   it("è deterministica: stessi dati, stessa proposta, in qualsiasi ordine", () => {
     const lista = Array.from({ length: 12 }, (_, i) => att({ id: `d${i}`, titolo: `T${i}`, durata: 30 + (i % 3) * 30, costi: C({ mentale: i % 3, fisica: (i + 1) % 3 }), area: i % 2 ? "casa" : "lavoro" }));
     const a = proponi(settimana(), 0, lista, REGOLE);

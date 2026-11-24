@@ -1,29 +1,27 @@
 # Priority Planner · piano
 
-Stato al 24/11/2026, versione 0.2.1. Tutti i 20 punti della revisione (rev. 3, 09/11/2026) sono approvati. La roadmap visiva è in `docs/roadmap/` e segue questo piano.
+Stato al 25/11/2026, versione 0.6.0. Approvati i 20 punti della revisione del piano (rev. 3, 09/11/2026) e i 12 punti delle Fasi 4 e 5 (`docs/revisione-fasi-4-5.html`, rev. 3). La roadmap visiva è in `docs/roadmap/`; la guida tecnica per chi sviluppa è `docs/sviluppo.md`.
 
-**Adesso:** Fase 1 (T2): modello dati, «Nuova attività», «Tutte le attività» con il filtro.
+**Adesso:** prova sul tablet delle Fasi 1–4; poi Fase 5 (T6), a partire dal prototipo dei file su Android. Le card con le checklist sono in `TODO.md`.
 
 ## Stato del lavoro
 
 | Fatto | # | Fase | Cosa vedi funzionare alla fine | Punti | Tempo indicativo |
 |---|---|---|---|---|---|
 | ✅ | T1 | 0 | L'app vuota si installa su tablet e Windows, con 4 stili in chiaro e scuro e l'aggiornamento automatico | D1, D2, D5 | ~2 h |
-| ⬜ | T2 | 1 | Crei attività con area, batterie e vincoli; vedi «Tutte le attività» con il filtro | A1, A2, C1, C3 | ~1,5 h |
-| ⬜ | T3 | 2 | «Il mio ritmo»: pennello, fasce, feste e ferie, ritmi salvati | B1, B2, B3, B6 | ~1,5 h |
-| ⬜ | T4 | 3 | Vista Settimana + «Proponi settimana», con attività lunghe e test | A3, B4, B7, B8 | ~3 h |
-| ⬜ | T5 | 4 | Vista Oggi, check-in del mattino, «Giorno no» | B5, C1 | ~1 h |
-| ⬜ | T6 | 5 | Importa / Esporta, provato tra tablet e telefono | D4 | ~1 h |
+| 🟡 | T2 | 1 | Crei attività con area, batterie e vincoli; vedi «Tutte le attività» con il filtro | A1, A2, C1, C3 | ~1,5 h |
+| 🟡 | T3 | 2 | «Il mio ritmo»: pennello, fasce, feste e ferie, ritmi salvati | B1, B2, B3, B6 | ~1,5 h |
+| 🟡 | T4 | 3 | Vista Settimana + «Proponi settimana», con attività lunghe e test | A3, B4, B7, B8 | ~3 h |
+| 🟡 | T5 | 4 | Vista Oggi, check-in, «Giorno no» | B5, C1 | ~1,5 h |
+| ⬜ | T6 | 5 | Prototipo file su Android, poi Importa / Esporta, provato tra tablet e telefono | D4 | ~2 h |
 
-I tempi sono stime del lavoro dell'agente. Ogni fase finisce con un APK provato sul tablet e con l'installer Windows.
+🟡 = scritta (0.3.0–0.6.0), in attesa della prova sul tablet. I tempi sono stime del lavoro dell'agente. Ogni fase finisce con un APK provato sul tablet e con l'installer Windows.
 
-Già presente nel codice (Fase 0, versioni 0.1.0–0.2.1):
-- Progetto Tauri 2 + Svelte + TypeScript, con `versioni.txt`.
-- I 4 stili (Liquid glass, Neumorfismo, Skeuomorfismo, Claymorphism) con chiaro e scuro e la finestra «Stile» con Applica / Annulla (`src/lib/aspetto.svelte.ts`).
-- La settimana corrente vuota, 7 giorni, con le fasce feriali e festive (`src/lib/fasce.ts`). Per ora sono festivi solo sabato e domenica: l'elenco «Feste e ferie» arriva in Fase 2.
-- Legenda di batterie e aree, solo icone (`src/lib/energia.ts`).
-- Aggiornamento automatico: all'avvio l'app cerca una release nuova su GitHub e mostra «Aggiorna a vX.Y.Z». Su Windows un clic scarica, installa e riavvia (provato da 0.2.0 a 0.2.1); su Android apre il download dell'APK (`src/lib/aggiornamento.svelte.ts`).
-- Build e pubblicazione: `build-android-alt.ps1` (APK arm64), `build-windows.ps1` (installer NSIS con certificato autofirmato e firma dell'updater), `release.ps1` (release GitHub con installer, APK e `latest.json`).
+Già presente nel codice (versioni 0.1.0–0.6.0):
+- Progetto Tauri 2 + Svelte + TypeScript, con `versioni.txt`; 4 stili in chiaro e scuro.
+- Attività con modelli, «Tutte le attività» con filtro, salvataggio in `dati.json`.
+- Il mio ritmo (livelli, feste e ferie, fasce orarie, regole), «Proponi settimana» con test, vista Oggi con check-in e Giorno no.
+- Aggiornamento automatico da GitHub e script `build-windows.ps1`, `build-android-alt.ps1`, `release.ps1`.
 
 ## L'idea in una riga
 
@@ -95,16 +93,29 @@ A fine settimana (B8) le attività non fatte e quelle in «Non ci sta» tornano 
 
 ## Giorno no e check-in (B5)
 
-- **Giorno no**: ogni livello di oggi scende di 1. Le attività di oggi si sbloccano, tranne quelle a orario fisso. L'app ricalcola da oggi a domenica; i giorni passati restano. Le attività spostate hanno un bordo giallo.
-- **Check-in del mattino**: 🙂 nessun cambio · 😐 −1 su Mentale ed Emotiva · 😣 Giorno no.
+Decisioni di dettaglio in `docs/revisione-fasi-4-5.html` (A1–A4, rev. 3). Idea per dopo la Fase 5: un tasto «Condividi» per mandare il file esportato direttamente a Telegram o Discord (Q1).
+
+- **Check-in** (A4, rev. 3): le faccine 🙂 😐 😣 stanno sempre in Oggi. Nessuna scelta = 🙂; nessuna richiesta all'avvio. Si cambiano quando vuoi, tutto il giorno, in meglio o in peggio. 😐 = −1 su 🧠 e ❤️‍🩹; 😣 Giorno no = −1 su tutte le batterie. Una scelta per data, salvata in `dati.json`.
+- **Calo per data** (A1): il check-in scrive `cali[data]`. `giorniPiano` lo sottrae da livelli e totale di quel giorno, mai sotto 0. Il ritmo non cambia.
+- **Ricalcolo a ogni cambio** (A2, A4), con le regole normali del bottone, senza priorità speciali (Q3):
+  - tocca solo quello che deve ancora arrivare: attività di oggi non fatte che iniziano dopo adesso, più i giorni dopo fino a domenica. Fatte, in corso e passate restano;
+  - per oggi il tempo libero parte dall'ora attuale (novità nel pianificatore);
+  - passando a 😣 o lasciandolo: si sbloccano le attività di oggi ancora da arrivare (non gli orari fissi), poi ricalcolo;
+  - passando a 😐 o a 🙂 senza toccare 😣: ricalcolo delle sole proposte; le bloccate restano.
+- **Attività spostate** (A3): nessun bordo giallo. Dopo il ricalcolo sono proposte, quindi tratteggiate; le blocchi di nuovo con 🔒.
+- **Annullare** (A4): tornare a 🙂 ricalcola di nuovo. Le attività non tornano per forza dove erano; non c'è copia della settimana.
 
 ## Le 6 schermate (C1)
 
 1. **Settimana**: la vista principale, griglia di 7 giorni per fasce.
-2. **Oggi**: solo «Adesso» e «Dopo», in grande.
+2. **Oggi** (B1, B2):
+   - l'app si apre come sempre sull'ultima schermata; in cima a Oggi una riga con 🙂 😐 😣, sempre modificabile;
+   - **Adesso** = l'attività non fatta il cui posto contiene l'ora attuale (se sono due, la prima che inizia). Nessuna: «Pausa»;
+   - **Dopo** = la prossima non fatta di oggi, con «tra 40 min». Dopo l'ultima: «Per oggi basta» e quante ne hai fatte, senza contare le mancate;
+   - ogni carta: titolo, orario, icone dei costi, bottone «Fatta». Le proposte tratteggiate compaiono come le altre. L'ora si aggiorna ogni minuto.
 3. **Nuova attività**: titolo, area, durata e 5 cursori. I modelli salvati compilano i campi.
 4. **Il mio ritmo**: la griglia da colorare con il pennello.
-5. **Check-in del mattino**: 3 faccine.
+5. **Check-in**: 3 faccine nella riga in cima a Oggi, modificabili tutto il giorno.
 6. **Tutte le attività**: elenco completo con stato (in settimana, da pianificare, non ci sta, fatta), scadenza, filtro e ricerca.
 
 **Filtro** (C3): Tutte · 💼 Lavoro · 🏡 Personale (tutte le aree tranne Lavoro). Vale in Settimana, Oggi e Tutte le attività. È solo visivo: le attività nascoste occupano comunque la fascia, che mostra un segno grigio.
@@ -129,6 +140,12 @@ A fine settimana (B8) le attività non fatte e quelle in «Non ci sta» tornano 
 - **Dati**: file JSON sul dispositivo. Offline, senza account.
 - **Pianificatore**: modulo TypeScript separato, con test.
 - **Calendari esterni**: nessuno per ora (D3). Gli impegni fissi si scrivono nell'app.
-- **Sincronizzazione** (D4): «Esporta» crea un `.json` con tutti i dati, la data e il dispositivo. «Importa» mostra le due date, chiede conferma e sostituisce tutto, dopo una copia di sicurezza dei dati attuali.
+- **Sincronizzazione** (D4; dettagli C1–C6 in `docs/revisione-fasi-4-5.html`):
+  - **Esporta**: su Windows la finestra «Salva» normale; su Android la finestra «Salva come» di Android, con un comando Kotlin nostro che scrive tramite il `ContentResolver`. I plugin ufficiali `dialog` + `fs` hanno un bug aperto che crea file vuoti ([plugins-workspace #3356](https://github.com/tauri-apps/plugins-workspace/issues/3356)). **Prima della Fase 5 serve un prototipo sul tablet.**
+  - **Importa**: finestra «Apri file» (`dialog`); se la lettura dal plugin non funziona su Android, lo stesso comando Kotlin legge il file.
+  - **Nel file**: tutto `dati.json` più `esportato` (data e ora), `dispositivo` e `versioneApp`. Nome proposto `priority-planner_AAAA-MM-GG_dispositivo.json`.
+  - **Restano sul dispositivo**: stile, tema, filtro, schermata e il nome del dispositivo, chiesto alla prima esportazione («Tablet», «Telefono», «PC») e modificabile in Il mio ritmo › Regole.
+  - **Prima di sostituire**: «Importa» mostra le due date e chiede conferma; salva una sola copia `backup-importazione.json` accanto a `dati.json`; il bottone «Torna ai dati prima dell'ultima importazione» la rimette, con conferma.
+  - **Versioni**: un file da una versione più nuova dell'app non si importa («Aggiorna l'app su questo dispositivo, poi riprova»); uno da una versione più vecchia sì, con i campi nuovi vuoti.
 - **Aggiornamenti**: release su GitHub (`MrsKugla/PriorityPlanner`), create con `release.ps1`. Non sostituiscono Importa / Esporta: aggiornano l'app, non spostano i dati.
 - **Versioni**: SemVer in `package.json`, `src-tauri/Cargo.toml`, `src-tauri/tauri.conf.json`, con `versioni.txt`.

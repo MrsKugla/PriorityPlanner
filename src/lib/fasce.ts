@@ -116,3 +116,8 @@ export function lunedi(oggi: Date): Date {
   d.setDate(d.getDate() - indiceSettimana(d));
   return d;
 }
+
+/* I 7 giorni da quel lunedì a domenica. */
+export function giorniDellaSettimana(lun: Date): Date[] {
+  return Array.from({ length: 7 }, (_, i) => new Date(lun.getFullYear(), lun.getMonth(), lun.getDate() + i));
+}

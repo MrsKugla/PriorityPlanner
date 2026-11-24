@@ -570,7 +570,7 @@ window.ROADMAP_DATA = {
           "does": [
             "Livelli di oggi −1, attività di oggi sbloccate (non quelle a orario fisso), ricalcolo fino a domenica; i giorni passati restano."
           ],
-          "expected": "Le attività spostate hanno il bordo giallo; gli orari fissi restano.",
+          "expected": "Le attività spostate tornano proposte (tratteggiate); orari fissi, fatte e in corso restano. Il check-in si cambia tutto il giorno e ogni cambio ricalcola da adesso.",
           "risks": "",
           "note": ""
         }

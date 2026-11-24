@@ -452,6 +452,25 @@ button:disabled { opacity: .38; cursor: default; }
   .tray { width: auto; max-height: 30%; border-right: 0; border-bottom: 1px solid var(--came); padding-left: 16px; }
 }
 
+/* ---------- Fase 4: Oggi e check-in ---------- */
+.today { display: flex; flex-direction: column; min-height: 0; overflow: auto; }
+.today-date { font-family: var(--body, inherit); font-size: 16px; font-weight: 500; letter-spacing: 0; }
+.checkin { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 12px 24px 12px 26px; border-bottom: 1px solid var(--came); font-size: 14px; }
+.today-body { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 24px; padding: 24px 26px; }
+.today-body h2 { margin: 0 0 10px; font-family: var(--display); font-size: 22px; font-weight: 700; }
+.today-body h2 .muted { font-family: inherit; font-size: 16px; font-weight: 500; }
+.today-card { display: grid; gap: 12px; padding: 18px 20px; border: 2px solid color-mix(in srgb, var(--tone) 55%, var(--hairline)); border-radius: calc(var(--radius-slot) + 8px); background: color-mix(in srgb, var(--tone) 16%, var(--glass-strong)); }
+.today-card.proposed { border-style: dashed; background: color-mix(in srgb, var(--tone) 8%, transparent); }
+.today-card-top { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.today-card h3 { flex: 1; min-width: 0; margin: 0; font-size: 24px; font-weight: 650; line-height: 1.2; overflow-wrap: anywhere; }
+.today-card-meta { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 0; color: var(--muted); font-size: 16px; }
+.today-costs { display: inline-flex; gap: 10px; }
+.today-card .ink-button { justify-self: start; min-height: 48px; padding-inline: 24px; font-size: 16px; }
+.today-empty { margin: 0 0 4px; font-family: var(--display); font-size: 30px; font-weight: 700; }
+:root[data-style=skeu] .today-card { border-radius: 3px; box-shadow: 0 1px 3px rgb(30 15 5 / .25); }
+:root[data-style=neu] .today-card:not(.proposed) { border: 0; box-shadow: var(--n-raise-xs); }
+:root[data-style=clay] .today-card:not(.proposed) { border: 0; box-shadow: var(--c-clay-bead, var(--c-clay-pressed)); }
+
 /* ---------- Fase 2: ritmo, feste, fasce ---------- */
 .head-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; }
 .party { margin-left: auto; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 10px; background: none; font-size: 17px; opacity: .3; filter: grayscale(1); cursor: pointer; transition: opacity .2s var(--ease-out), filter .2s var(--ease-out); }
@@ -487,8 +506,8 @@ button:disabled { opacity: .38; cursor: default; }
 :root[data-style=clay] .rhythm-cell { border: 0; box-shadow: var(--c-sink); }
 
 @media (max-width: 900px) {
-  .nav { order: 3; width: 100%; margin-right: 0; }
-  .nav .seg-item { flex: 1; }
+  .nav { order: 3; width: 100%; margin-right: 0; overflow-x: auto; scrollbar-width: none; }
+  .nav .seg-item { flex: 1 0 auto; }
   .task-open { grid-template-columns: 34px minmax(0, 1fr) auto; grid-template-areas: "a t s" "a c m"; row-gap: 2px; }
   .task-area { grid-area: a; }
   .task-title { grid-area: t; }

@@ -1,3 +1,9 @@
+0.6.0 - [25/11/2026]
+    - Fase 4: nuova schermata «Oggi» con «Adesso» e «Dopo» in grande, «tra N min», «Pausa», «Per oggi basta» con le attività fatte e bottone «Fatta»; segue il filtro 💼 / 🏡 (file: src/components/Oggi.svelte)
+    - Check-in 🙂 😐 😣 sempre modificabile in cima a Oggi: abbassa l'energia solo di quel giorno, senza toccare il ritmo, e ricalcola da adesso a domenica; il Giorno no sblocca le attività di oggi non ancora iniziate, tornare a 🙂 ricalcola di nuovo (file: src/lib/dati.svelte.ts)
+    - «Proponi settimana» non mette più niente prima dell'ora attuale e lascia dove sono le attività già iniziate; 2 test nuovi (file: src/lib/pianificatore.ts, src/lib/pianificatore.test.ts)
+    - Il menu in alto scorre invece di sovrapporsi su schermi stretti; nuovo AGENTS.md per chi riprende il lavoro e piano aggiornato con le decisioni delle Fasi 4 e 5
+
 0.5.0 - [24/11/2026]
     - Fase 3: bottone «Proponi settimana» che mette le attività da oggi a domenica rispettando orari fissi, scadenze, livelli delle fasce, totale del giorno e massimo di attività pesanti; chi non entra va in «Non ci sta» con il motivo (file: src/lib/pianificatore.ts)
     - Attività lunghe su fasce consecutive, più attività brevi nella stessa fascia e cuscinetto dopo un costo 3; regole modificabili in Il mio ritmo › Regole (file: src/components/RitmoVista.svelte)
