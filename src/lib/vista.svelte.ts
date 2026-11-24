@@ -2,7 +2,7 @@
    Il filtro cambia solo cosa vedi: l'energia resta una sola. Si ricorda tra un avvio e l'altro. */
 import type { Attivita } from "./dati.svelte";
 
-export type Schermata = "settimana" | "tutte";
+export type Schermata = "settimana" | "tutte" | "ritmo";
 export type Filtro = "tutte" | "lavoro" | "personale";
 
 const CHIAVE = "priority-planner.vista.v1";
@@ -11,7 +11,7 @@ function leggi(): { schermata: Schermata; filtro: Filtro } {
   try {
     const s = JSON.parse(localStorage.getItem(CHIAVE) ?? "{}");
     return {
-      schermata: s.schermata === "tutte" ? "tutte" : "settimana",
+      schermata: s.schermata === "tutte" || s.schermata === "ritmo" ? s.schermata : "settimana",
       filtro: s.filtro === "lavoro" || s.filtro === "personale" ? s.filtro : "tutte",
     };
   } catch {

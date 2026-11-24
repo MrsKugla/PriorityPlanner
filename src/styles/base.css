@@ -413,6 +413,40 @@ button:disabled { opacity: .38; cursor: default; }
 :root[data-style=skeu] .task-list .task-title, :root[data-style=skeu] .task-form h2 { font-family: var(--display); }
 :root[data-style=skeu] .task-row { border-bottom-color: var(--sk-rule); }
 
+/* ---------- Fase 2: ritmo, feste, fasce ---------- */
+.head-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; }
+.party { margin-left: auto; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 10px; background: none; font-size: 17px; opacity: .3; filter: grayscale(1); cursor: pointer; transition: opacity .2s var(--ease-out), filter .2s var(--ease-out); }
+.today-chip + .party { margin-left: 2px; }
+.party:hover { opacity: .7; }
+.party.on { opacity: 1; filter: none; }
+.party:disabled { cursor: default; }
+.party:focus-visible { outline: 3px solid var(--signal); outline-offset: 1px; }
+.day-note { margin: -2px 8px 2px; color: var(--muted); font-size: 12.5px; font-style: italic; }
+.rhythm-name { width: 200px; }
+.brush .swatch { display: grid; place-items: center; width: 100%; height: 100%; border-radius: inherit; background: color-mix(in srgb, var(--tone) calc(var(--lv) * 30%), transparent); }
+.brush .dot-pick { width: 52px; }
+.rhythm-grid { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(7, minmax(104px, 1fr)); align-items: start; gap: 8px; padding: 0 16px 8px; overflow: auto; overscroll-behavior: contain; touch-action: pan-x pan-y; user-select: none; -webkit-user-select: none; }
+.rhythm-col { display: flex; flex-direction: column; gap: 4px; }
+.rhythm-cell { display: flex; align-items: center; justify-content: space-between; gap: 6px; min-height: 40px; padding: 4px 10px; border: 1px solid var(--hairline); border-radius: var(--radius-slot); background: color-mix(in srgb, var(--tone) calc(var(--lv) * 28%), var(--well)); color: var(--ink); font: inherit; cursor: crosshair; touch-action: none; transition: background .15s var(--ease-out); }
+.rhythm-cell b { font-size: 15px; font-variant-numeric: tabular-nums; }
+.rhythm-cell:focus-visible { outline: 3px solid var(--signal); outline-offset: 1px; }
+.rhythm-total { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 6px 2px 0; font-size: 13px; }
+.rhythm-total .input { width: 64px; min-height: 38px; }
+.rhythm-hint { margin: 0; padding: 8px 24px 14px 26px; color: var(--muted); font-size: 13px; line-height: 1.45; }
+.settings { flex: 1; min-height: 0; overflow: auto; padding: 18px 24px 24px 26px; }
+.settings > p { max-width: 70ch; }
+.add-btn { margin-bottom: 16px; }
+.plain-list { margin: 8px 0 0; padding: 0; list-style: none; }
+.plain-list li { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 16px; min-height: 52px; border-bottom: 1px solid var(--hairline); }
+.slot-editors { display: flex; flex-wrap: wrap; gap: 8px 32px; }
+.slot-editor { flex: 1 1 320px; }
+.slot-edit { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.slot-edit .input { width: 120px; }
+.settings .dialog-actions { justify-content: flex-start; }
+:root[data-style=skeu] .rhythm-cell { border-radius: 0; }
+:root[data-style=neu] .rhythm-cell { border: 0; box-shadow: var(--n-sink-s); }
+:root[data-style=clay] .rhythm-cell { border: 0; box-shadow: var(--c-sink); }
+
 @media (max-width: 900px) {
   .nav { order: 3; width: 100%; margin-right: 0; }
   .nav .seg-item { flex: 1; }

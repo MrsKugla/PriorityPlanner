@@ -1,6 +1,7 @@
 <script lang="ts">
   import Settimana from "./components/Settimana.svelte";
   import TutteAttivita from "./components/TutteAttivita.svelte";
+  import RitmoVista from "./components/RitmoVista.svelte";
   import AttivitaDialog from "./components/AttivitaDialog.svelte";
   import StileDialog from "./components/StileDialog.svelte";
   import Icona from "./components/Icona.svelte";
@@ -34,6 +35,7 @@
     <nav class="seg nav" aria-label="Schermate">
       <label class="seg-item"><input type="radio" name="schermata" value="settimana" bind:group={vista.schermata} /><span>Settimana</span></label>
       <label class="seg-item"><input type="radio" name="schermata" value="tutte" bind:group={vista.schermata} /><span>Tutte le attività</span></label>
+      <label class="seg-item"><input type="radio" name="schermata" value="ritmo" bind:group={vista.schermata} /><span>Il mio ritmo</span></label>
     </nav>
     <div class="bar-actions">
       <Aggiornamento />
@@ -59,7 +61,9 @@
   {/if}
 
   <main class="pane glass">
-    {#if vista.schermata === "tutte"}
+    {#if vista.schermata === "ritmo"}
+      <RitmoVista />
+    {:else if vista.schermata === "tutte"}
       <TutteAttivita onApri={(a) => attivita.apri(a)} />
     {:else}
       <Settimana />

@@ -2,6 +2,7 @@
    (comandi Rust leggi_dati / scrivi_dati); nel browser di sviluppo in localStorage. */
 import { invoke, isTauri } from "@tauri-apps/api/core";
 import type { Area, Batteria } from "./energia";
+import { FASCE_FERIALI, FASCE_FESTIVE, type Calendario, type Fascia, type Festa } from "./fasce";
 
 export type BatteriaId = Batteria["id"];
 export type AreaId = Area["id"];
@@ -42,24 +43,62 @@ export interface Modello {
   durata: number;
 }
 
-export interface Dati {
+/** Un ritmo (B3, B6): livello 0–3 per colonna (lun…dom) × fascia × batteria, più i totali del giorno corretti a mano. */
+export interface Ritmo {
+  id: string;
+  nome: string;
+  /** 7 colonne; lun–ven seguono le fasce feriali, sab–dom le festive (stessa lunghezza). */
+  livelli: Costi[][];
+  /** Per colonna: totale scelto a mano per una batteria; assente = automatico (40%). */
+  totali: Partial<Costi>[];
+}
+
+export interface Dati extends Calendario {
   formato: 1;
   aggiornato: string;
   attivita: Attivita[];
   modelli: Modello[];
+  ritmi: Ritmo[];
+  /** Lunedì della settimana (AAAA-MM-GG) → id del ritmo scelto; assente = il primo ritmo. */
+  settimane: Record<string, string>;
 }
 
 export const FORMATO = 1;
 const CHIAVE_BROWSER = "priority-planner.dati.v1";
 const AREE_VALIDE: readonly AreaId[] = ["lavoro", "famiglia", "amici", "salute", "casa", "me"];
 const STATI_VALIDI: readonly StatoAttivita[] = ["da-pianificare", "in-settimana", "non-ci-sta", "fatta"];
-const BATTERIE_IDS: readonly BatteriaId[] = ["mentale", "emotiva", "sociale", "sensoriale", "fisica"];
+export const BATTERIE_IDS: readonly BatteriaId[] = ["mentale", "emotiva", "sociale", "sensoriale", "fisica"];
 
 export const costiZero = (): Costi => ({ mentale: 0, emotiva: 0, sociale: 0, sensoriale: 0, fisica: 0 });
 export const nuovoId = (): string => crypto.randomUUID();
+const costiUguali = (n: number): Costi => ({ mentale: n, emotiva: n, sociale: n, sensoriale: n, fisica: n });
+
+/* Un ritmo nuovo parte con tutte le fasce a livello 2: abbastanza per provare il bottone, da colorare poi. */
+function ritmoBase(nome: string, cal: Calendario): Ritmo {
+  return {
+    id: nuovoId(),
+    nome,
+    livelli: Array.from({ length: 7 }, (_, c) => (c < 5 ? cal.fasce.feriali : cal.fasce.festive).map(() => costiUguali(2))),
+    totali: Array.from({ length: 7 }, () => ({})),
+  };
+}
+
+/* Dopo un cambio delle fasce, ogni colonna ha tante righe quante fasce: si tengono le prime, le nuove partono da 2. */
+function adattaRitmo(r: Ritmo, cal: Calendario): void {
+  for (let c = 0; c < 7; c++) {
+    const n = (c < 5 ? cal.fasce.feriali : cal.fasce.festive).length;
+    const col = (r.livelli[c] ?? []).slice(0, n);
+    while (col.length < n) col.push(costiUguali(2));
+    r.livelli[c] = col;
+    r.totali[c] ??= {};
+  }
+  r.livelli.length = 7;
+  r.totali.length = 7;
+}
 
 function vuoti(): Dati {
-  return { formato: FORMATO, aggiornato: new Date().toISOString(), attivita: [], modelli: [] };
+  const cal: Calendario = { fasce: { feriali: [...FASCE_FERIALI], festive: [...FASCE_FESTIVE] }, feste: [] };
+  return { formato: FORMATO, aggiornato: new Date().toISOString(), attivita: [], modelli: [], ...cal, ritmi: [ritmoBase("Normale", cal)], settimane: {} };
 }
 
 /* Controlla e ripulisce un file letto dal disco: un campo strano diventa il suo valore neutro, invece di rompere l'app. */
@@ -100,7 +139,50 @@ export function leggiDati(testo: string): Dati {
     costi: costi(g.costi),
     durata: durata(g.durata),
   }));
-  return { formato: FORMATO, aggiornato: typeof grezzi.aggiornato === "string" ? grezzi.aggiornato : new Date().toISOString(), attivita, modelli };
+  const base = vuoti();
+  const leggiFasceSalvate = (l: unknown, predefinite: Fascia[]): Fascia[] => {
+    if (!Array.isArray(l) || !l.length) return predefinite;
+    const ok = l.every((f) => f && typeof f.inizio === "number" && typeof f.fine === "number" && f.fine > f.inizio);
+    return ok ? l.map((f) => ({ inizio: f.inizio, fine: f.fine })) : predefinite;
+  };
+  const fasceGrezze = (grezzi.fasce ?? {}) as Record<string, unknown>;
+  const cal: Calendario = {
+    fasce: { feriali: leggiFasceSalvate(fasceGrezze.feriali, base.fasce.feriali), festive: leggiFasceSalvate(fasceGrezze.festive, base.fasce.festive) },
+    feste: (Array.isArray(grezzi.feste) ? grezzi.feste : []).flatMap((g: Record<string, unknown>): Festa[] => {
+      const dal = data(g.dal);
+      const al = data(g.al) ?? dal;
+      return dal && al ? [{ id: typeof g.id === "string" ? g.id : nuovoId(), dal, al: al < dal ? dal : al, nome: typeof g.nome === "string" ? g.nome : "" }] : [];
+    }),
+  };
+  const ritmi = (Array.isArray(grezzi.ritmi) ? grezzi.ritmi : []).map((g: Record<string, unknown>): Ritmo => {
+    const r: Ritmo = {
+      id: typeof g.id === "string" ? g.id : nuovoId(),
+      nome: typeof g.nome === "string" ? g.nome : "Ritmo",
+      livelli: (Array.isArray(g.livelli) ? g.livelli : []).map((col: unknown) => (Array.isArray(col) ? col.map(costi) : [])),
+      totali: (Array.isArray(g.totali) ? g.totali : []).map((t: unknown) => {
+        const r: Partial<Costi> = {};
+        if (t && typeof t === "object") for (const b of BATTERIE_IDS) {
+          const v = (t as Record<string, unknown>)[b];
+          if (typeof v === "number" && v >= 0) r[b] = Math.round(v);
+        }
+        return r;
+      }),
+    };
+    adattaRitmo(r, cal);
+    return r;
+  });
+  const settimane: Record<string, string> = {};
+  if (grezzi.settimane && typeof grezzi.settimane === "object")
+    for (const [k, v] of Object.entries(grezzi.settimane)) if (data(k) && typeof v === "string") settimane[k] = v;
+  return {
+    formato: FORMATO,
+    aggiornato: typeof grezzi.aggiornato === "string" ? grezzi.aggiornato : new Date().toISOString(),
+    attivita,
+    modelli,
+    ...cal,
+    ritmi: ritmi.length ? ritmi : [ritmoBase("Normale", cal)],
+    settimane,
+  };
 }
 
 type Caricamento = "carico" | "pronto" | "errore";
@@ -119,10 +201,11 @@ export async function carica(): Promise<void> {
   }
 }
 
-/* Le scritture vanno in fila: due modifiche rapide non si sovrappongono sul disco. */
+/* Le scritture vanno in fila e si raccolgono per 250 ms: una pennellata trascinata su 20 caselle scrive una volta sola. */
 let coda: Promise<void> = Promise.resolve();
-function salva(): void {
-  if (archivio.fase !== "pronto") return;
+let attesa: number | undefined;
+function scrivi(): void {
+  attesa = undefined;
   archivio.dati.aggiornato = new Date().toISOString();
   const testo = JSON.stringify(archivio.dati, null, 2);
   coda = coda
@@ -131,6 +214,18 @@ function salva(): void {
       archivio.errore = `Salvataggio non riuscito: ${String(e)}`;
     });
 }
+export function salva(): void {
+  if (archivio.fase !== "pronto") return;
+  clearTimeout(attesa);
+  attesa = window.setTimeout(scrivi, 250);
+}
+/* Chiudere l'app subito dopo una modifica non deve perderla. */
+addEventListener("pagehide", () => {
+  if (attesa !== undefined) {
+    clearTimeout(attesa);
+    scrivi();
+  }
+});
 
 export function salvaAttivita(a: Attivita): void {
   const i = archivio.dati.attivita.findIndex((x) => x.id === a.id);
@@ -160,5 +255,65 @@ export function salvaModello(m: Modello): void {
 
 export function eliminaModello(id: string): void {
   archivio.dati.modelli = archivio.dati.modelli.filter((m) => m.id !== id);
+  salva();
+}
+
+/* ---------- Ritmi (B3, B6) ---------- */
+
+/** Il ritmo della settimana che inizia in quel lunedì (AAAA-MM-GG); senza scelta, il primo. */
+export function ritmoDellaSettimana(lunediChiave: string): Ritmo {
+  const d = archivio.dati;
+  return d.ritmi.find((r) => r.id === d.settimane[lunediChiave]) ?? d.ritmi[0];
+}
+
+export function scegliRitmo(lunediChiave: string, id: string): void {
+  archivio.dati.settimane[lunediChiave] = id;
+  salva();
+}
+
+/** Un ritmo nuovo parte da una copia di uno esistente (B6). */
+export function copiaRitmo(da: Ritmo, nome: string): Ritmo {
+  const r: Ritmo = { id: nuovoId(), nome, livelli: $state.snapshot(da.livelli), totali: $state.snapshot(da.totali) };
+  archivio.dati.ritmi.push(r);
+  salva();
+  return archivio.dati.ritmi.at(-1)!;
+}
+
+export function eliminaRitmo(id: string): void {
+  if (archivio.dati.ritmi.length < 2) return;
+  archivio.dati.ritmi = archivio.dati.ritmi.filter((r) => r.id !== id);
+  for (const [k, v] of Object.entries(archivio.dati.settimane)) if (v === id) delete archivio.dati.settimane[k];
+  salva();
+}
+
+/** «Copia lunedì su mar–ven»: livelli e totali corretti a mano. */
+export function copiaLunedi(r: Ritmo): void {
+  for (let c = 1; c < 5; c++) {
+    r.livelli[c] = r.livelli[0].map((x) => ({ ...x }));
+    r.totali[c] = { ...r.totali[0] };
+  }
+  salva();
+}
+
+/* ---------- Fasce e feste (B1, B2) ---------- */
+
+export function salvaFasce(feriali: Fascia[], festive: Fascia[]): void {
+  archivio.dati.fasce = { feriali, festive };
+  for (const r of archivio.dati.ritmi) adattaRitmo(r, archivio.dati);
+  salva();
+}
+
+export function ripristinaFasce(): void {
+  salvaFasce([...FASCE_FERIALI], [...FASCE_FESTIVE]);
+}
+
+export function aggiungiFesta(dal: string, al: string, nome: string): void {
+  archivio.dati.feste.push({ id: nuovoId(), dal, al: al < dal ? dal : al, nome: nome.trim() });
+  archivio.dati.feste.sort((a, b) => a.dal.localeCompare(b.dal));
+  salva();
+}
+
+export function eliminaFesta(id: string): void {
+  archivio.dati.feste = archivio.dati.feste.filter((f) => f.id !== id);
   salva();
 }

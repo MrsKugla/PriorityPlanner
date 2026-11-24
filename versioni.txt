@@ -1,3 +1,10 @@
+0.4.0 - [24/11/2026]
+    - Fase 2: schermata «Il mio ritmo» con griglia 7 giorni × fasce, pennello per batteria e livello 0–3 (tocco o trascinamento), «Copia lunedì su mar–ven» e totale del giorno al 40% correggibile a mano (file: src/components/RitmoVista.svelte)
+    - Più ritmi salvati con nome, creati da copia, e scelta del ritmo per ogni settimana dalla vista Settimana (file: src/lib/dati.svelte.ts, src/components/Settimana.svelte)
+    - Feste e ferie per data o intervallo con nome, pulsante 🎉 per segnare un giorno feriale come festivo; la notte 0–3:30 solo prima di un festivo (file: src/lib/fasce.ts)
+    - Fasce orarie feriali e festive modificabili, con controllo delle sovrapposizioni e ripristino delle predefinite
+    - Primi test automatici delle regole su festivi, fasce e totale del giorno (file: src/lib/fasce.test.ts)
+
 0.3.0 - [24/11/2026]
     - Fase 1: nuova attività con titolo, area, durata, 5 costi a icone, scadenza, giorno preferito e orario fisso; modifica, eliminazione e modelli salvati (file: src/components/AttivitaDialog.svelte, src/lib/dati.svelte.ts)
     - Schermata «Tutte le attività» con stato, scadenza, ricerca, ordinamento, spunta «fatta» e filtro Tutte · 💼 · 🏡 ricordato tra un avvio e l'altro (file: src/components/TutteAttivita.svelte, src/components/FiltroAree.svelte, src/lib/vista.svelte.ts)
