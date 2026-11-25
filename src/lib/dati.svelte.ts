@@ -7,12 +7,13 @@ import {
   lunedi, totaleAuto, type Calendario, type Fascia, type Festa,
 } from "./fasce";
 import { proponi, type GiornoPiano } from "./pianificatore";
+import { occorrenze } from "./serie";
 
 export type BatteriaId = Batteria["id"];
 export type AreaId = Area["id"];
 /** Costo da 0 a 3 per ogni batteria. */
 export type Costi = Record<BatteriaId, number>;
-export type StatoAttivita = "da-pianificare" | "in-settimana" | "non-ci-sta" | "fatta";
+export type StatoAttivita = "da-pianificare" | "in-settimana" | "non-ci-sta" | "fatta" | "saltata";
 /** Check-in del giorno (B5, A4): 🙂 bene, 😐 così così, 😣 Giorno no. */
 export type Umore = "bene" | "cosi" | "no";
 
@@ -41,6 +42,38 @@ export interface Attivita {
   posto: Posto | null;
   /** Perché non ci sta (es. «gio–ven: 💪 finita»); null altrimenti. */
   motivo: string | null;
+  /** Id della serie di cui è un'occorrenza; null per le attività normali. */
+  serie: string | null;
+  /** «2026-11-24» (giorni) o «2026-11-23#2» (volte: lunedì#n); null per le normali. */
+  giornoSerie: string | null;
+  /** Giorni con ora libera: il pianificatore la mette solo in quel giorno (AAAA-MM-GG). */
+  soloGiorno: string | null;
+}
+
+/** Un'attività che si ripete (Fase 6). */
+export interface Serie {
+  id: string;
+  titolo: string;
+  area: AreaId;
+  costi: Costi;
+  durata: number;
+  /** Giorni precisi oppure N volte a settimana. */
+  tipo: "giorni" | "volte";
+  /** 0 = lunedì … 6 = domenica; usato con tipo «giorni». */
+  giorni: number[];
+  /** 1–7; usato con tipo «volte». */
+  volte: number;
+  /** 1–4; conta dalle settimane da lunedi(inizio). */
+  ogniSettimane: number;
+  /** Minuti dalla mezzanotte; null = orario libero; solo con tipo «giorni». */
+  ora: number | null;
+  inizio: string;
+  /** Ultimo giorno incluso. */
+  fine: string | null;
+  inPausa: boolean;
+  saltaFeste: boolean;
+  recupera: boolean;
+  creata: string;
 }
 
 /** Il posto di un'attività in un giorno. Minuti dalla mezzanotte di `data` (≥ 1440 = dopo mezzanotte). */
@@ -97,12 +130,14 @@ export interface Dati extends Calendario {
   checkin: Record<string, Umore>;
   /** Data → quanto scende ogni batteria quel giorno (A1). Il ritmo non cambia. */
   cali: Record<string, Partial<Costi>>;
+  /** Attività che si ripetono (Fase 6). */
+  serie: Serie[];
 }
 
 export const FORMATO = 1;
 const CHIAVE_BROWSER = "priority-planner.dati.v1";
 const AREE_VALIDE: readonly AreaId[] = ["lavoro", "famiglia", "amici", "salute", "casa", "me"];
-const STATI_VALIDI: readonly StatoAttivita[] = ["da-pianificare", "in-settimana", "non-ci-sta", "fatta"];
+const STATI_VALIDI: readonly StatoAttivita[] = ["da-pianificare", "in-settimana", "non-ci-sta", "fatta", "saltata"];
 export const BATTERIE_IDS: readonly BatteriaId[] = ["mentale", "emotiva", "sociale", "sensoriale", "fisica"];
 
 export const costiZero = (): Costi => ({ mentale: 0, emotiva: 0, sociale: 0, sensoriale: 0, fisica: 0 });
@@ -138,7 +173,7 @@ function vuoti(): Dati {
   const cal: Calendario = { fasce: { feriali: [...FASCE_FERIALI], festive: [...FASCE_FESTIVE] }, feste: [] };
   return {
     formato: FORMATO, aggiornato: new Date().toISOString(), attivita: [], modelli: [], ...cal,
-    ritmi: [ritmoBase("Normale", cal)], settimane: {}, regole: { ...REGOLE_PREDEFINITE }, ultimaSettimana: "", checkin: {}, cali: {},
+    ritmi: [ritmoBase("Normale", cal)], settimane: {}, regole: { ...REGOLE_PREDEFINITE }, ultimaSettimana: "", checkin: {}, cali: {}, serie: [],
   };
 }
 
@@ -166,6 +201,30 @@ function leggiPosto(p: unknown): Posto | null {
   if (!g || !giorno || typeof g.inizio !== "number" || typeof g.fine !== "number" || g.fine <= g.inizio) return null;
   return { data: giorno, inizio: g.inizio, fine: g.fine, bloccato: g.bloccato === true, perche: typeof g.perche === "string" ? g.perche : "" };
 }
+function leggiSerie(g: Record<string, unknown>): Serie {
+  const intero = (n: unknown, min: number, max: number): number =>
+    typeof n === "number" && Number.isFinite(n) && Math.round(n) >= min && Math.round(n) <= max ? Math.round(n) : min;
+  const giorni = [...new Set((Array.isArray(g.giorni) ? g.giorni : []).filter((n): n is number => Number.isInteger(n) && n >= 0 && n <= 6))].sort((x, y) => x - y);
+  const tipo = g.tipo === "volte" ? "volte" : "giorni";
+  return {
+    id: typeof g.id === "string" ? g.id : nuovoId(),
+    titolo: typeof g.titolo === "string" ? g.titolo : "",
+    area: area(g.area),
+    costi: costi(g.costi),
+    durata: durata(g.durata),
+    tipo,
+    giorni,
+    volte: intero(g.volte, 1, 7),
+    ogniSettimane: intero(g.ogniSettimane, 1, 4),
+    ora: tipo === "giorni" && typeof g.ora === "number" && Number.isFinite(g.ora) ? g.ora : null,
+    inizio: data(g.inizio) ?? chiaveData(new Date()),
+    fine: data(g.fine),
+    inPausa: g.inPausa === true,
+    saltaFeste: g.saltaFeste === true,
+    recupera: g.recupera === true,
+    creata: typeof g.creata === "string" ? g.creata : new Date().toISOString(),
+  };
+}
 
 export function leggiDati(testo: string): Dati {
   const grezzi = JSON.parse(testo) as Record<string, unknown>;
@@ -186,6 +245,9 @@ export function leggiDati(testo: string): Dati {
       creata: typeof g.creata === "string" ? g.creata : new Date().toISOString(),
       posto: leggiPosto(g.posto),
       motivo: typeof g.motivo === "string" ? g.motivo : null,
+      serie: typeof g.serie === "string" ? g.serie : null,
+      giornoSerie: typeof g.giornoSerie === "string" ? g.giornoSerie : null,
+      soloGiorno: data(g.soloGiorno),
     };
   });
   const modelli = (Array.isArray(grezzi.modelli) ? grezzi.modelli : []).map((g: Record<string, unknown>): Modello => ({
@@ -233,6 +295,7 @@ export function leggiDati(testo: string): Dati {
     for (const [k, v] of Object.entries(grezzi.settimane)) if (data(k) && typeof v === "string") settimane[k] = v;
   return {
     formato: FORMATO,
+    serie: (Array.isArray(grezzi.serie) ? grezzi.serie : []).map(leggiSerie),
     aggiornato: typeof grezzi.aggiornato === "string" ? grezzi.aggiornato : new Date().toISOString(),
     attivita,
     modelli,
@@ -520,15 +583,115 @@ export function salvaRegole(r: Regole): void {
   salva();
 }
 
-/** Fine settimana (B8): le non fatte delle settimane passate e quelle in «Non ci sta» tornano da pianificare.
-    L'app non cancella niente. Restituisce quante attività sono tornate. */
-export function apriSettimana(lunediChiave: string): number {
+/* Un'occorrenza di serie «da oggi in poi»: i giorni precisi dal giorno stesso, le «volte» dal lunedì di questa settimana. */
+const dallOggi = (a: Attivita, ora: Date): boolean => {
+  const g = a.giornoSerie;
+  if (!g) return false;
+  return g.slice(0, 10) >= (g.includes("#") ? chiaveData(lunedi(ora)) : chiaveData(ora));
+};
+
+/** La serie di un'occorrenza, se esiste ancora; undefined = attività normale (niente ↻). */
+export function serieDi(a: Attivita): Serie | undefined {
+  return a.serie ? archivio.dati.serie.find((s) => s.id === a.serie) : undefined;
+}
+
+/** Crea le occorrenze mancanti della settimana che inizia in `lun`, dal giorno `daGiorno`. Idempotente. */
+export function generaOccorrenze(lun: Date, daGiorno: number): void {
   const d = archivio.dati;
-  if (d.ultimaSettimana === lunediChiave) return 0;
+  const esistenti = new Set<string>();
+  for (const a of d.attivita) if (a.serie && a.giornoSerie) esistenti.add(`${a.serie}|${a.giornoSerie}`);
+  const giorni = giorniDellaSettimana(lun);
+  const nuove = d.serie.flatMap((s) => occorrenze(s, giorni, daGiorno, d, esistenti));
+  if (!nuove.length) return;
+  d.attivita.push(...nuove);
+  salva();
+}
+
+export function salvaSerie(s: Serie, ambito: "nuova" | "prossime", ora = new Date()): void {
+  const d = archivio.dati;
+  const i = d.serie.findIndex((x) => x.id === s.id);
+  if (i >= 0) d.serie[i] = s;
+  else d.serie.push(s);
+  if (ambito === "prossime") {
+    const bloccata = (a: Attivita): boolean => !!a.posto && a.posto.bloccato && a.posto.perche !== "orario fisso";
+    d.attivita = d.attivita.filter((a) => a.serie !== s.id || !dallOggi(a, ora) || a.stato === "fatta" || a.stato === "saltata" || bloccata(a));
+    for (const a of d.attivita) {
+      if (a.serie !== s.id || a.stato === "fatta" || !dallOggi(a, ora)) continue;
+      a.titolo = s.titolo;
+      a.area = s.area;
+      a.costi = { ...s.costi };
+      a.durata = s.durata;
+      if (a.posto) a.posto.fine = a.posto.inizio + a.durata;
+    }
+  }
+  generaOccorrenze(lunedi(ora), indiceSettimana(ora));
+  salva();
+}
+
+export function eliminaSerie(id: string, ora = new Date()): void {
+  const d = archivio.dati;
+  d.serie = d.serie.filter((s) => s.id !== id);
+  d.attivita = d.attivita.filter((a) => a.serie !== id || a.stato === "fatta" || !dallOggi(a, ora));
+  for (const a of d.attivita) {
+    if (a.serie !== id || a.stato === "fatta") continue;
+    a.serie = null;
+    a.giornoSerie = null;
+    a.soloGiorno = null;
+  }
+  salva();
+}
+
+export function saltaOccorrenza(id: string): void {
+  const a = archivio.dati.attivita.find((x) => x.id === id);
+  if (!a) return;
+  a.stato = "saltata";
+  a.posto = null;
+  a.motivo = null;
+  salva();
+}
+
+export function ripristinaOccorrenza(id: string): void {
+  const a = archivio.dati.attivita.find((x) => x.id === id);
+  if (!a) return;
+  a.motivo = null;
+  if (a.orarioFisso) {
+    const { data, inizio } = a.orarioFisso;
+    a.stato = "in-settimana";
+    a.posto = { data, inizio, fine: inizio + a.durata, bloccato: true, perche: "orario fisso" };
+  } else {
+    a.stato = "da-pianificare";
+    a.posto = null;
+  }
+  salva();
+}
+
+/** Fine settimana (B8): le non fatte delle settimane passate e quelle in «Non ci sta» tornano da pianificare.
+    Le occorrenze di serie scadute tornano solo se la serie recupera, altrimenti sono saltate.
+    L'app non cancella niente. Restituisce quante attività sono tornate. */
+export function apriSettimana(ora = new Date()): number {
+  const d = archivio.dati;
+  const lun = lunedi(ora);
+  const chiave = chiaveData(lun);
+  if (d.ultimaSettimana === chiave) {
+    generaOccorrenze(lun, indiceSettimana(ora));
+    return 0;
+  }
   let tornate = 0;
   for (const a of d.attivita) {
-    if (a.stato === "fatta") continue;
-    const passata = a.posto && a.posto.data < lunediChiave;
+    if (a.stato === "fatta" || a.stato === "saltata") continue;
+    const s = serieDi(a);
+    if (s && a.giornoSerie && a.giornoSerie.slice(0, 10) < chiave) {
+      a.posto = null;
+      a.motivo = null;
+      if (s.recupera) {
+        a.soloGiorno = null;
+        a.orarioFisso = null;
+        a.stato = "da-pianificare";
+        tornate++;
+      } else a.stato = "saltata";
+      continue;
+    }
+    const passata = a.posto && a.posto.data < chiave;
     if (passata || a.stato === "non-ci-sta") {
       a.posto = null;
       a.motivo = null;
@@ -537,7 +700,8 @@ export function apriSettimana(lunediChiave: string): number {
     }
   }
   const primaVolta = !d.ultimaSettimana;
-  d.ultimaSettimana = lunediChiave;
+  d.ultimaSettimana = chiave;
+  generaOccorrenze(lun, 0);
   salva();
   return primaVolta ? 0 : tornate;
 }

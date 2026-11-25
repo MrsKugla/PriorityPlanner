@@ -1,11 +1,15 @@
 /* Il bottone «Proponi settimana» (A3, B4, B7). Modulo puro e deterministico: stessi dati = stessa proposta.
 
    1. Occupano il posto per primi: attività fatte o bloccate in settimana, proposte nei giorni passati, orari fissi.
+      Le occorrenze `saltata` sono ignorate del tutto (niente posto, niente esito).
       Oggi conta l'ora attuale (`adesso`): le proposte già iniziate restano e il tempo prima di adesso non è libero.
-   2. Le altre, in ordine: scadenza più vicina, poi costo totale più alto (poi titolo e id, per non dipendere dall'ordine).
+   2. Le altre, in ordine: prima le occorrenze con giorno preciso (`soloGiorno`), poi le altre occorrenze di una serie
+      (costo totale più alto, poi titolo e id), infine le attività normali: scadenza più vicina, poi costo totale più alto
+      (poi titolo e id, per non dipendere dall'ordine).
    3. Una posizione è valida se: c'è tempo libero (attività lunghe = fasce consecutive vuote, la pausa interrompe),
       ogni fascia occupata ha il livello ≥ costo per ogni batteria, il totale del giorno non si supera
       e il giorno non ha già il massimo di attività pesanti ❤️‍🩹 / 💬.
+      Con `soloGiorno` l'unico giorno valido è quello. Due occorrenze della stessa serie non stanno nello stesso giorno.
    4. Tra le valide vince quella con più energia libera; il giorno preferito vale molto, la stessa area nello stesso giorno un po' meno.
    5. Chi non entra riceve il motivo, raggruppato per giorni consecutivi («gio–ven: 💪 finita»). */
 import { BATTERIE } from "./energia";
@@ -39,6 +43,7 @@ class Giorno {
   usato: Costi = { mentale: 0, emotiva: 0, sociale: 0, sensoriale: 0, fisica: 0 };
   pesanti = 0;
   aree = new Map<string, number>();
+  serie = new Set<string>();
   constructor(readonly g: GiornoPiano) {
     this.libero = g.fasce.map((f) => [[f.inizio, f.fine]]);
   }
@@ -64,6 +69,7 @@ class Giorno {
     for (const b of IDS) this.usato[b] += a.costi[b];
     if (pesante(a.costi)) this.pesanti++;
     this.aree.set(a.area, (this.aree.get(a.area) ?? 0) + 1);
+    if (a.serie !== null) this.serie.add(a.serie);
   }
 
   vuota(i: number): boolean {
@@ -133,6 +139,7 @@ export function proponi(
   // 1. Quello che resta fermo.
   const daPianificare: Attivita[] = [];
   for (const a of attivita) {
+    if (a.stato === "saltata") continue;
     const d = a.posto ? indice.get(a.posto.data) : undefined;
     const passata = d !== undefined && (d < daGiorno || (d === daGiorno && a.posto!.inizio < adesso));
     if (a.posto && d !== undefined && (a.stato === "fatta" || a.posto.bloccato || passata)) {
@@ -153,10 +160,12 @@ export function proponi(
   // Oggi il tempo prima di adesso è passato.
   if (adesso > 0 && stato[daGiorno]) stato[daGiorno].occupa(0, adesso);
 
-  // 2. Ordine.
+  // 2. Ordine: giorno preciso, serie, normali.
+  const gruppo = (a: Attivita) => (a.soloGiorno !== null ? 0 : a.serie !== null ? 1 : 2);
   daPianificare.sort(
     (a, b) =>
-      (a.scadenza ?? "9999").localeCompare(b.scadenza ?? "9999") ||
+      gruppo(a) - gruppo(b) ||
+      (gruppo(a) === 2 ? (a.scadenza ?? "9999").localeCompare(b.scadenza ?? "9999") : 0) ||
       costoTotale(b.costi) - costoTotale(a.costi) ||
       a.titolo.localeCompare(b.titolo, "it") ||
       a.id.localeCompare(b.id),
@@ -169,9 +178,17 @@ export function proponi(
     let migliore: { d: number; c: Candidato; punti: number } | null = null;
     const motivi: { giorno: number; testo: string }[] = [];
 
-    for (let d = daGiorno; d <= ultimo; d++) {
+    // Con `soloGiorno` l'unico giorno valido è quello (fuori dalla settimana o già passato: nessun giorno).
+    const unico = a.soloGiorno !== null ? (indice.get(a.soloGiorno) ?? -1) : null;
+    const primo = unico === null ? daGiorno : unico;
+    const fino = unico === null ? ultimo : unico;
+    for (let d = Math.max(primo, daGiorno); d <= fino; d++) {
       const g = stato[d];
       if (a.scadenza && !scaduta && giorni[d].chiave > a.scadenza) break;
+      if (a.serie !== null && a.soloGiorno === null && g.serie.has(a.serie)) {
+        motivi.push({ giorno: d, testo: "c'è già oggi" });
+        continue;
+      }
       const tempo = posizioni(g, a.durata);
       if (!tempo.length) {
         motivi.push({ giorno: d, testo: "nessuno spazio libero" });

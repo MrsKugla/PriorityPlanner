@@ -18,7 +18,7 @@ function att(p: Partial<Attivita>): Attivita {
   n++;
   return {
     id: p.id ?? `a${n}`, titolo: p.titolo ?? `Attività ${n}`, area: "lavoro", costi: C(), durata: 60, scadenza: null, orarioFisso: null,
-    giornoPreferito: null, stato: "da-pianificare", creata: "", posto: null, motivo: null, ...p,
+    giornoPreferito: null, stato: "da-pianificare", creata: "", posto: null, motivo: null, serie: null, giornoSerie: null, soloGiorno: null, ...p,
   };
 }
 
@@ -97,5 +97,49 @@ describe("proponi", () => {
     const a = proponi(settimana(), 0, lista, REGOLE);
     const b = proponi(settimana(), 0, [...lista].reverse(), REGOLE);
     expect([...b].sort()).toEqual([...a].sort());
+  });
+
+  it("caso 8: la palestra libera di giovedì passa davanti al report con scadenza, se l'energia basta per uno solo", () => {
+    const giorni = settimana((k, i) => giorno(k, 2, i === 3 ? 1 : 0));
+    const e = proponi(giorni, 0, [
+      att({ id: "report", scadenza: "2026-11-26", costi: C({ mentale: 1 }) }),
+      att({ id: "palestra", serie: "s1", giornoSerie: "2026-11-26", soloGiorno: "2026-11-26", costi: C({ mentale: 1 }) }),
+    ], REGOLE);
+    expect(e.get("palestra")).toMatchObject({ tipo: "posto", data: "2026-11-26" });
+    expect(e.get("report")).toMatchObject({ tipo: "nonCiSta" });
+  });
+
+  it("caso 9: con giovedì pieno la serie con giorno preciso non si sposta: «gio: …»", () => {
+    const giorni = settimana((k, i) => giorno(k, 2, i === 3 ? 0 : 6));
+    const e = proponi(giorni, 0, [att({ id: "medicine", serie: "s1", giornoSerie: "2026-11-26", soloGiorno: "2026-11-26", costi: C({ fisica: 1 }) })], REGOLE);
+    const esito = e.get("medicine");
+    expect(esito).toMatchObject({ tipo: "nonCiSta" });
+    expect(esito?.tipo === "nonCiSta" && esito.motivo.startsWith("gio: ")).toBe(true);
+  });
+
+  it("soloGiorno fuori dalla settimana: nessun giorno disponibile", () => {
+    const e = proponi(settimana(), 0, [att({ id: "x", serie: "s1", soloGiorno: "2026-12-10" })], REGOLE);
+    expect(e.get("x")).toEqual({ tipo: "nonCiSta", motivo: "nessun giorno disponibile" });
+  });
+
+  it("ignora le occorrenze saltate: niente posto e niente esito, nemmeno se hanno un posto", () => {
+    const posto = { data: "2026-11-26", inizio: 540, fine: 600, bloccato: false, perche: "" };
+    const e = proponi(settimana(), 0, [att({ id: "s", serie: "s1", stato: "saltata" }), att({ id: "s2", serie: "s1", stato: "saltata", posto })], REGOLE);
+    expect(e.size).toBe(0);
+  });
+
+  it("due occorrenze «volte» della stessa serie finiscono in giorni diversi", () => {
+    const giorni = [giorno(CHIAVI[0], 2, 30), giorno(CHIAVI[1], 2, 30)];
+    const e = proponi(giorni, 0, [att({ id: "c1", serie: "corsa", giornoSerie: "lunedì#1" }), att({ id: "c2", serie: "corsa", giornoSerie: "lunedì#2" })], REGOLE);
+    const dati = [e.get("c1"), e.get("c2")].map((x) => (x?.tipo === "posto" ? x.data : null));
+    expect(dati.every(Boolean)).toBe(true);
+    expect(dati[0]).not.toBe(dati[1]);
+  });
+
+  it("la serie già presente in un giorno (anche fissa) non ci torna: «c'è già oggi»", () => {
+    const giorni = [giorno(CHIAVI[0], 2, 30)];
+    const fissa = att({ id: "f", serie: "corsa", orarioFisso: { data: CHIAVI[0], inizio: 540 } });
+    const e = proponi(giorni, 0, [fissa, att({ id: "c2", serie: "corsa" })], REGOLE);
+    expect(e.get("c2")).toEqual({ tipo: "nonCiSta", motivo: "lun: c'è già oggi" });
   });
 });

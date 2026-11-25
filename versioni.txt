@@ -1,3 +1,10 @@
+0.8.0 - [25/11/2026]
+    - Fase 6: attività che si ripetono. «Si ripete» in «Nuova attività» crea una serie (giorni precisi, N volte a settimana, ogni N settimane, orario fisso o libero, fino al, in pausa, salta feste, recupera se salti) con la barra di 7 giorni (file: src/lib/serie.ts, src/components/AttivitaDialog.svelte, src/components/GiorniSerie.svelte)
+    - Le volte della serie nascono da sole ogni settimana senza doppioni; a fine settimana le non fatte diventano «saltate», salvo «Recupera se salti» (file: src/lib/dati.svelte.ts)
+    - «Proponi settimana» mette prima le ricorrenti; una volta «solo quel giorno» non cambia giorno, due volte della stessa serie mai nello stesso giorno (file: src/lib/pianificatore.ts)
+    - «Salta» al posto di «Togli» per le volte di una serie, anche in Oggi; modifica «Solo questa volta» / «Anche le prossime»; gruppo «Si ripetono» in «Tutte le attività» con ripristino delle saltate; segno ↻ (file: src/components/Settimana.svelte, src/components/TutteAttivita.svelte, src/components/Oggi.svelte)
+    - Le attività lunghe nella Settimana occupano un solo blocco con l'orario intero, senza «↳»
+
 0.7.0 - [25/11/2026]
     - Fase 5: Esporta salva un file con tutte le attività, i ritmi e le regole, più data, nome del dispositivo e versione; su Android usa «Salva come» con un comando Kotlin che scrive il file scelto, così Download e Drive ricevono il contenuto completo (file: src/lib/scambio.svelte.ts, src-tauri/gen/android/app/src/main/java/it/priorityplanner/app/FilePlugin.kt)
     - Importa apre un file, mostra le due date e chiede conferma prima di sostituire tutto; un file da una versione più nuova dell'app viene rifiutato (file: src/components/Scambio.svelte)

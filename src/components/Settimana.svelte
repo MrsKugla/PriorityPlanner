@@ -4,7 +4,7 @@
   import { BATTERIE, AREE } from "../lib/energia";
   import {
     aggiungiFesta, archivio, bloccaTutte, cambiaBlocco, eliminaFesta, minutiDi, proponiSettimana, ritmoDellaSettimana,
-    scegliRitmo, segnaFatta, sposta, togliDallaSettimana, type Attivita,
+    scegliRitmo, segnaFatta, sposta, togliDallaSettimana, serieDi, saltaOccorrenza, type Attivita,
   } from "../lib/dati.svelte";
   import { formatoDurata, passaFiltro, vista } from "../lib/vista.svelte";
   import {
@@ -46,6 +46,31 @@
     return qui
       .map((a) => ({ a, inizia: a.posto!.inizio >= f.inizio, nascosta: !passaFiltro(a, vista.filtro) }))
       .sort((x, y) => x.a.posto!.inizio - y.a.posto!.inizio);
+  }
+
+  /* E1: fasce contigue coperte per intero dalla stessa attività visibile diventano un solo blocco. */
+  function blocchiDelGiorno(chiave: string, fasce: readonly Fascia[]) {
+    const blocchi: {
+      fascia: Fascia; fine: number; voci: ReturnType<typeof nellaFascia>; unito: boolean; pausa: { da: number; a: number } | null;
+    }[] = [];
+    let i = 0;
+    while (i < fasce.length) {
+      const fascia = fasce[i];
+      const voci = nellaFascia(chiave, fascia);
+      const pausa = i > 0 && fascia.inizio !== fasce[i - 1].fine ? { da: fasce[i - 1].fine, a: fascia.inizio } : null;
+      let j = i;
+      if (voci.length === 1 && !voci[0].nascosta && voci[0].inizia) {
+        const id = voci[0].a.id;
+        while (j + 1 < fasce.length && fasce[j + 1].inizio === fasce[j].fine) {
+          const v = nellaFascia(chiave, fasce[j + 1]);
+          if (v.length === 1 && !v[0].nascosta && v[0].a.id === id) j++;
+          else break;
+        }
+      }
+      blocchi.push({ fascia, fine: fasce[j].fine, voci, unito: j > i, pausa });
+      i = j + 1;
+    }
+    return blocchi;
   }
 
   function proponi(): void {
@@ -95,8 +120,13 @@
       <span class="muted">Tocca una fascia per metterla lì.</span>
       {#if attivitaScelta.posto}
         <button type="button" class="text-button" onclick={() => cambiaBlocco(attivitaScelta.id)}>{attivitaScelta.posto.bloccato ? "🔓 Sblocca" : "🔒 Blocca"}</button>
-        <button type="button" class="text-button" onclick={() => { togliDallaSettimana(attivitaScelta.id); scelta = null; }}>Togli</button>
+        {#if !serieDi(attivitaScelta)}
+          <button type="button" class="text-button" onclick={() => { togliDallaSettimana(attivitaScelta.id); scelta = null; }}>Togli</button>
+        {/if}
         <button type="button" class="text-button" onclick={() => segnaFatta(attivitaScelta.id, attivitaScelta.stato !== "fatta")}>{attivitaScelta.stato === "fatta" ? "Da fare" : "Fatta"}</button>
+      {/if}
+      {#if serieDi(attivitaScelta)}
+        <button type="button" class="text-button" onclick={() => { saltaOccorrenza(attivitaScelta.id); scelta = null; }}>Salta</button>
       {/if}
       <button type="button" class="text-button" onclick={() => onApri(attivitaScelta)}>Modifica</button>
       <button type="button" class="text-button" onclick={() => (scelta = null)}>Chiudi</button>
@@ -115,7 +145,7 @@
           <li>
             <button type="button" class="tray-card" class:picked={scelta === a.id} onclick={() => scegli(a.id)} style:--tone={areaDi(a.area).colore}>
               <span aria-hidden="true">{areaDi(a.area).icona}</span>
-              <span class="grow">{a.titolo}</span>
+              <span class="grow">{a.titolo}{#if serieDi(a)} <span aria-hidden="true">↻</span>{/if}</span>
               <span class="muted">{formatoDurata(a.durata)}</span>
             </button>
           </li>
@@ -130,7 +160,7 @@
             <li>
               <button type="button" class="tray-card" class:picked={scelta === a.id} onclick={() => scegli(a.id)} style:--tone={areaDi(a.area).colore}>
                 <span aria-hidden="true">{areaDi(a.area).icona}</span>
-                <span class="grow">{a.titolo}<small>{a.motivo}</small></span>
+                <span class="grow">{a.titolo}{#if serieDi(a)} <span aria-hidden="true">↻</span>{/if}<small>{a.motivo}</small></span>
               </button>
             </li>
           {/each}
@@ -161,17 +191,18 @@
           </h2>
           {#if festa?.nome}<p class="day-note">{festa.nome}</p>{/if}
           <ol class="slots">
-            {#each fasce as fascia, i (fascia.inizio)}
-              {@const voci = nellaFascia(chiavi[gi], fascia)}
-              {#if i > 0 && fascia.inizio !== fasce[i - 1].fine}
-                <li class="pause" aria-label="Pausa">pausa {ora(fasce[i - 1].fine)}–{ora(fascia.inizio)}</li>
+            {#each blocchiDelGiorno(chiavi[gi], fasce) as blocco (blocco.fascia.inizio)}
+              {@const fascia = blocco.fascia}
+              {@const intervallo = blocco.unito ? { ...fascia, fine: blocco.fine } : fascia}
+              {#if blocco.pausa}
+                <li class="pause" aria-label="Pausa">pausa {ora(blocco.pausa.da)}–{ora(blocco.pausa.a)}</li>
               {/if}
-              <li class="slot" class:has-cards={voci.length > 0} style:--span={Math.max(1, (fascia.fine - fascia.inizio) / 60)}>
+              <li class="slot" class:has-cards={blocco.voci.length > 0} style:--span={Math.max(1, (fascia.fine - fascia.inizio) / 60)}>
                 {#if scelta}
-                  <button type="button" class="slot-drop" onclick={() => mettiQui(chiavi[gi], fascia)} aria-label="Metti {attivitaScelta?.titolo} {nomeGiorno.format(giorno)} {etichetta(fascia)}"></button>
+                  <button type="button" class="slot-drop" onclick={() => mettiQui(chiavi[gi], fascia)} aria-label="Metti {attivitaScelta?.titolo} {nomeGiorno.format(giorno)} {etichetta(intervallo)}"></button>
                 {/if}
-                <span class="slot-time">{etichetta(fascia)}</span>
-                {#each voci as { a, inizia, nascosta } (a.id)}
+                <span class="slot-time">{etichetta(intervallo)}</span>
+                {#each blocco.voci as { a, inizia, nascosta } (a.id)}
                   {#if nascosta}
                     <span class="hidden-mark" title="Occupata da un'attività nascosta dal filtro"></span>
                   {:else if inizia}
@@ -183,10 +214,11 @@
                       class:picked={scelta === a.id}
                       style:--tone={areaDi(a.area).colore}
                       onclick={() => scegli(a.id)}
-                      aria-label="{a.titolo}, {orario(a)}, {a.posto!.bloccato ? 'bloccata' : 'proposta'}{a.stato === 'fatta' ? ', fatta' : ''}"
+                      aria-label="{a.titolo}{serieDi(a) ? ', si ripete' : ''}, {orario(a)}, {a.posto!.bloccato ? 'bloccata' : 'proposta'}{a.stato === 'fatta' ? ', fatta' : ''}"
                     >
                       <span class="card-top">
                         <span class="card-area" aria-hidden="true">{areaDi(a.area).icona}</span>
+                        {#if serieDi(a)}<span class="card-lock" aria-hidden="true">↻</span>{/if}
                         <span class="card-title">{a.titolo}</span>
                         {#if a.posto!.bloccato}<span class="card-lock" aria-hidden="true">🔒</span>{/if}
                       </span>

@@ -2,7 +2,7 @@
    Restano sul dispositivo stile, tema, filtro, schermata e il nome del dispositivo (localStorage). */
 import { invoke, isTauri } from "@tauri-apps/api/core";
 import { apriSettimana, archivio, leggiDati, salva, type Dati } from "./dati.svelte";
-import { chiaveData, lunedi } from "./fasce";
+import { chiaveData } from "./fasce";
 import { vista } from "./vista.svelte";
 
 const CHIAVE_DISPOSITIVO = "priority-planner.dispositivo.v1";
@@ -97,7 +97,7 @@ export async function leggiFileDaImportare(): Promise<DaImportare | null> {
 function sostituisci(dati: Dati): void {
   archivio.dati = dati;
   salva();
-  vista.tornate = apriSettimana(chiaveData(lunedi(new Date())));
+  vista.tornate = apriSettimana();
 }
 
 /** Sostituisce tutti i dati, dopo una copia di quelli attuali in backup-importazione.json. */

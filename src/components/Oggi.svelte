@@ -2,7 +2,7 @@
   /* Vista Oggi (B1, B2, A4): check-in sempre modificabile in cima, poi solo «Adesso» e «Dopo», in grande.
      Ogni cambio di faccina ricalcola da adesso a domenica. L'ora si aggiorna da sola. */
   import { AREE, BATTERIE } from "../lib/energia";
-  import { archivio, cambiaCheckin, minutiDi, segnaFatta, umoreDi, BATTERIE_IDS, type Attivita, type Umore } from "../lib/dati.svelte";
+  import { archivio, cambiaCheckin, minutiDi, saltaOccorrenza, segnaFatta, serieDi, umoreDi, BATTERIE_IDS, type Attivita, type Umore } from "../lib/dati.svelte";
   import { passaFiltro, vista } from "../lib/vista.svelte";
   import { chiaveData, ora } from "../lib/fasce";
   import FiltroAree from "./FiltroAree.svelte";
@@ -59,7 +59,7 @@
   <article class="today-card" class:proposed={!v.a.posto!.bloccato} style:--tone={areaDi(v.a.area).colore}>
     <div class="today-card-top">
       <span class="task-area" aria-hidden="true">{areaDi(v.a.area).icona}</span>
-      <h3>{v.a.titolo}</h3>
+      <h3>{#if serieDi(v.a)}<span class="ripete" role="img" aria-label="Si ripete">↻</span> {/if}{v.a.titolo}</h3>
       {#if v.a.posto!.bloccato}<span aria-label="bloccata">🔒</span>{/if}
     </div>
     <p class="today-card-meta">
@@ -68,7 +68,10 @@
         {#each BATTERIE_IDS.filter((b) => v.a.costi[b] > 0) as b (b)}<span>{iconaDi[b]}{v.a.costi[b]}</span>{/each}
       </span>
     </p>
-    <button type="button" class="ink-button" onclick={() => segnaFatta(v.a.id, true)}>Fatta</button>
+    <div class="today-card-actions">
+      <button type="button" class="ink-button" onclick={() => segnaFatta(v.a.id, true)}>Fatta</button>
+      {#if serieDi(v.a)}<button type="button" class="text-button" onclick={() => saltaOccorrenza(v.a.id)}>Salta</button>{/if}
+    </div>
   </article>
 {/snippet}
 

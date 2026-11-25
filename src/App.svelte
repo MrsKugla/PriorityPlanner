@@ -10,11 +10,10 @@
   import { aspetto, applica, STILI } from "./lib/aspetto.svelte";
   import { controllaAggiornamenti } from "./lib/aggiornamento.svelte";
   import { apriSettimana, archivio, carica } from "./lib/dati.svelte";
-  import { chiaveData, lunedi } from "./lib/fasce";
   import { vista } from "./lib/vista.svelte";
 
   carica().then(() => {
-    if (archivio.fase === "pronto") vista.tornate = apriSettimana(chiaveData(lunedi(new Date())));
+    if (archivio.fase === "pronto") vista.tornate = apriSettimana();
   });
   controllaAggiornamenti();
 
@@ -71,7 +70,7 @@
     {:else if vista.schermata === "ritmo"}
       <RitmoVista />
     {:else if vista.schermata === "tutte"}
-      <TutteAttivita onApri={(a) => attivita.apri(a)} />
+      <TutteAttivita onApri={(a) => attivita.apri(a)} onApriSerie={(s) => attivita.apriSerie(s)} />
     {:else}
       <Settimana onApri={(a) => attivita.apri(a)} />
     {/if}

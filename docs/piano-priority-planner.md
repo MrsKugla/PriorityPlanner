@@ -1,8 +1,8 @@
 # Priority Planner · piano
 
-Stato al 25/11/2026, versione 0.7.0. Approvati i 20 punti della revisione del piano (rev. 3, 09/11/2026) e i 12 punti delle Fasi 4 e 5 (`docs/revisione-fasi-4-5.html`, rev. 3). La roadmap visiva è in `docs/roadmap/`; la guida tecnica per chi sviluppa è `docs/sviluppo.md`.
+Stato al 25/11/2026, versione 0.8.0. Approvati i 20 punti della revisione del piano (rev. 3, 09/11/2026), i 12 punti delle Fasi 4 e 5 (`docs/revisione-fasi-4-5.html`, rev. 3) e i 16 punti della Fase 6 (`docs/revisione-fase-6.html`, rev. 4). La roadmap visiva è in `docs/roadmap/`; la guida tecnica per chi sviluppa è `docs/sviluppo.md`. Le idee per dopo stanno nella colonna «Idee per dopo» di `TODO.md`.
 
-**Adesso:** tutte le fasi sono scritte. Resta la prova sul tablet (Fasi 1–5), a partire da Esporta in Download e Drive. Le card con le checklist sono in `TODO.md`, colonna «Da provare sul tablet».
+**Adesso:** prova sul tablet delle Fasi 1–6 (a partire da Esporta in Download e Drive, poi le serie della 0.8.0). Le card con le checklist sono in `TODO.md`.
 
 ## Stato del lavoro
 
@@ -14,8 +14,9 @@ Stato al 25/11/2026, versione 0.7.0. Approvati i 20 punti della revisione del pi
 | 🟡 | T4 | 3 | Vista Settimana + «Proponi settimana», con attività lunghe e test | A3, B4, B7, B8 | ~3 h |
 | 🟡 | T5 | 4 | Vista Oggi, check-in, «Giorno no» | B5, C1 | ~1,5 h |
 | 🟡 | T6 | 5 | Importa / Esporta (Kotlin su Android), provato tra tablet e telefono | D4 | ~2 h |
+| 🟡 | T7 | 6 | Attività che si ripetono (serie, «Si ripete», «Salta», ricorrenti prima delle altre) e attività lunghe in un solo blocco nella Settimana (E1) | Fase 6 A1–E1 | ~4 h |
 
-🟡 = scritta (0.3.0–0.7.0), in attesa della prova sul tablet. I tempi sono stime del lavoro dell'agente. Ogni fase finisce con un APK provato sul tablet e con l'installer Windows.
+🟡 = scritta (0.3.0–0.8.0), in attesa della prova sul tablet. I tempi sono stime del lavoro dell'agente. Ogni fase finisce con un APK provato sul tablet e con l'installer Windows.
 
 Già presente nel codice (versioni 0.1.0–0.7.0):
 - Progetto Tauri 2 + Svelte + TypeScript, con `versioni.txt`; 4 stili in chiaro e scuro.
@@ -49,7 +50,7 @@ flowchart LR
 |---|---|---|
 | **Area** (1 per attività) | 💼 Lavoro, 👪 Famiglia, 🧡 Amici, 🩺 Salute, 🏠 Casa, 🌱 Me stessa | Colore e icona della carta; alternare le aree nella settimana; filtro Lavoro / Personale |
 | **Batterie** (costo 0–3 ciascuna) | 🧠 Mentale, ❤️‍🩹 Emotiva, 💬 Sociale, 🎧 Sensoriale, 💪 Fisica | Decidono **dove** entra un'attività. Nomi e icone si possono cambiare |
-| **Vincoli di tempo** | Durata, scadenza, orario fisso, giorno preferito | Decidono **quando** può entrare |
+| **Vincoli di tempo** | Durata, scadenza, orario fisso, giorno preferito; per le serie anche «solo quel giorno» (Fase 6) | Decidono **quando** può entrare |
 
 **Cuscinetto** (A3): dopo un'attività con almeno un costo 3, l'app lascia 15 minuti liberi. Si sceglie 0, 15 o 30 minuti.
 
@@ -85,7 +86,7 @@ Attività lunghe (B7):
 - Un'attività breve entra in una fascia se c'è tempo libero; più attività brevi possono stare nella stessa fascia.
 - Un'attività lunga occupa fasce consecutive e vuote; una pausa interrompe la sequenza.
 - Ogni fascia occupata deve avere il livello sufficiente; il costo conta una volta sola nel totale del giorno.
-- Nella griglia la carta sta nella prima fascia; le fasce dopo mostrano «↳» con il nome.
+- Nella griglia la carta sta nella prima fascia; le fasce dopo mostrano «↳» con il nome. **Fase 6 (E1):** le fasce consecutive coperte dalla stessa attività diventano un solo blocco, alto come una fascia, con una carta e l'orario intero («9–12»). Il giorno si accorcia; le ore tra i giorni non restano allineate.
 
 Le proposte hanno il bordo tratteggiato. Clic su una carta = la blocchi (🔒, bordo pieno): resta ferma quando chiedi una nuova proposta. Ogni carta dice in una riga «perché qui». Con gli stessi dati la proposta è sempre la stessa.
 
@@ -105,6 +106,21 @@ Decisioni di dettaglio in `docs/revisione-fasi-4-5.html` (A1–A4, rev. 3). Idea
 - **Attività spostate** (A3): nessun bordo giallo. Dopo il ricalcolo sono proposte, quindi tratteggiate; le blocchi di nuovo con 🔒.
 - **Annullare** (A4): tornare a 🙂 ricalcola di nuovo. Le attività non tornano per forza dove erano; non c'è copia della settimana.
 
+## Attività che si ripetono (Fase 6)
+
+Decisioni in `docs/revisione-fase-6.html` (rev. 3). Versione 0.8.0, file compatibile (formato 1, campi facoltativi). Nella stessa fase anche E1 (attività lunghe in un solo blocco, sezione «Proponi settimana»).
+
+- **Serie e occorrenze** (A1, A2): una **serie** in `dati.serie` (titolo, area, costi, durata, regola, orario, inizio, fine, pausa) crea **occorrenze**, cioè `Attivita` normali con `serie` e `giornoSerie`. Una sola occorrenza per serie e giorno (per «N volte»: `lunedì#n`), anche se saltata o fatta.
+- **Regola** (B1): giorni precisi (tutti e 7 = ogni giorno), oppure N volte a settimana in giorni liberi; in più «ogni N settimane». «Ogni mese»: idea per dopo (Q1).
+- **Orario** (B2): fisso (solo con giorni precisi) = `orarioFisso` di quel giorno; libero con giorni precisi = **solo quel giorno** (vincolo nuovo, altrimenti «Non ci sta» con il motivo); libero con N volte = qualsiasi giorno, mai due della stessa serie nello stesso giorno.
+- **Inizio, fine, pausa** (B3): inizio = oggi, fine facoltativa, interruttore «In pausa». **Feste e ferie** (B4): casella «Salta feste e ferie», spenta.
+- **Quando nascono** (C1): all'apertura di una settimana nuova per tutta la settimana; alla creazione o modifica di una serie da oggi a domenica. Mai giorni passati, mai settimane future. Nascono da pianificare o all'orario fisso.
+- **Non fatte** (C2): a fine settimana diventano **saltate**, non tornano e niente avviso. Casella «Recupera se salti» (es. bollette): accesa = seguono il riporto di B8.
+- **Salta** (C3): per un'occorrenza solo «Salta» (stato `saltata`, libera energia), niente «Togli». Si sposta una volta toccando la carta e poi una fascia. «Salta» si annulla aprendo la serie, che mostra le volte di questa settimana, saltate comprese.
+- **Modificare** (C4): «Solo questa volta» o «Anche le prossime» (ricrea le occorrenze da oggi non fatte e non spostate a mano). «Elimina serie» toglie le future non fatte, le fatte restano.
+- **Pianificatore** (C5, Scarto): le ricorrenti passano prima. Ordine: orari fissi, bloccate, fatte e passate ferme; poi le occorrenze «solo quel giorno», poi «N volte», tra loro costo più alto prima; poi le altre attività con scadenza e costo. Con il Giorno no le attività con scadenza finiscono più facilmente in «Non ci sta».
+- **Interfaccia** (D1–D3): interruttore «Si ripete» in «Nuova attività»; giorni scelti e riassunti con una barra di 7 rettangoli L M M G V S D (accesi nel colore dell'area) con l'ora accanto («2× sett.», «ogni 2 sett.», «orario libero» nei casi senza giorni o ora). Carte con ↻ in Settimana e Oggi. In «Tutte le attività» un gruppo «Si ripetono», una riga per serie con la barra; le singole volte compaiono solo se da pianificare o in «Non ci sta». Nessun contatore di costanza (premio: idea per dopo).
+
 ## Le 6 schermate (C1)
 
 1. **Settimana**: la vista principale, griglia di 7 giorni per fasce.
@@ -113,10 +129,10 @@ Decisioni di dettaglio in `docs/revisione-fasi-4-5.html` (A1–A4, rev. 3). Idea
    - **Adesso** = l'attività non fatta il cui posto contiene l'ora attuale (se sono due, la prima che inizia). Nessuna: «Pausa»;
    - **Dopo** = la prossima non fatta di oggi, con «tra 40 min». Dopo l'ultima: «Per oggi basta» e quante ne hai fatte, senza contare le mancate;
    - ogni carta: titolo, orario, icone dei costi, bottone «Fatta». Le proposte tratteggiate compaiono come le altre. L'ora si aggiorna ogni minuto.
-3. **Nuova attività**: titolo, area, durata e 5 cursori. I modelli salvati compilano i campi.
+3. **Nuova attività**: titolo, area, durata e 5 cursori. I modelli salvati compilano i campi. Da 0.8.0 l'interruttore «Si ripete» crea una serie.
 4. **Il mio ritmo**: la griglia da colorare con il pennello.
 5. **Check-in**: 3 faccine nella riga in cima a Oggi, modificabili tutto il giorno.
-6. **Tutte le attività**: elenco completo con stato (in settimana, da pianificare, non ci sta, fatta), scadenza, filtro e ricerca.
+6. **Tutte le attività**: elenco completo con stato (in settimana, da pianificare, non ci sta, fatta), scadenza, filtro e ricerca. Da 0.8.0 un gruppo «Si ripetono» con una riga per serie.
 
 **Filtro** (C3): Tutte · 💼 Lavoro · 🏡 Personale (tutte le aree tranne Lavoro). Vale in Settimana, Oggi e Tutte le attività. È solo visivo: le attività nascoste occupano comunque la fascia, che mostra un segno grigio.
 

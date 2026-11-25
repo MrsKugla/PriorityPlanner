@@ -536,3 +536,49 @@ button:disabled { opacity: .38; cursor: default; }
   .pane-head { padding: 16px 16px 12px; }
   .legend { padding: 10px 16px 12px; }
 }
+
+/* ---------- Fase 6: attività che si ripetono ---------- */
+.giorni-serie { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; min-width: 0; margin: 0 0 12px; }
+.giorni-serie-set { display: inline-flex; gap: 4px; }
+.giorni-serie-testo { color: var(--muted); font-size: 14px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.giorno-serie { display: grid; place-items: center; width: 36px; min-height: 40px; padding: 0; border: 0; border-radius: 10px; background: var(--well); box-shadow: inset 0 0 0 1px var(--hairline); color: var(--muted); font: inherit; font-size: 14px; font-weight: 600; transition: background .2s var(--ease-out), color .2s var(--ease-out); }
+button.giorno-serie { cursor: pointer; }
+button.giorno-serie:active { transform: scale(.94); }
+button.giorno-serie:focus-visible { outline: 3px solid var(--signal); outline-offset: 2px; }
+.giorno-serie.on { background: color-mix(in srgb, var(--tone, var(--lead)) 55%, var(--glass-strong)); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--tone, var(--lead)) 75%, transparent); color: var(--ink); }
+.giorni-serie.piccola { margin: 0; gap: 8px; }
+.giorni-serie.piccola .giorni-serie-set { gap: 2px; }
+.giorni-serie.piccola .giorno-serie { width: 18px; min-height: 20px; border-radius: 5px; font-size: 11px; }
+.giorni-serie.piccola .giorni-serie-testo { font-size: 13px; }
+:root[data-style=neu] .giorno-serie { box-shadow: var(--n-sink-s); }
+:root[data-style=neu] .giorno-serie.on { box-shadow: var(--n-raise-xs); }
+:root[data-style=clay] .giorno-serie { box-shadow: var(--c-sink); }
+:root[data-style=clay] .giorno-serie.on { box-shadow: var(--c-clay-pressed); }
+:root[data-style=skeu] .giorno-serie { border-radius: 3px; }
+
+.ripete { color: color-mix(in srgb, var(--tone, var(--lead)) 80%, var(--ink)); font-weight: 700; }
+.serie-box { padding: 12px 14px 4px; border: 1px solid var(--hairline); border-radius: var(--radius-slot); background: var(--well); }
+.serie-box > .seg { justify-self: start; margin-bottom: 12px; }
+.serie-box .field-row { align-items: center; }
+.serie-errore { margin: 0 0 10px; color: color-mix(in srgb, #b4442f 80%, var(--ink)); font-size: 14px; }
+.serie-ambito { margin-top: 18px; padding: 12px 14px; border: 1px solid var(--hairline); border-radius: var(--radius-slot); background: var(--well); }
+.serie-ambito p { margin: 0; font-size: 15px; font-weight: 500; }
+.serie-ambito .dialog-actions { margin-top: 12px; }
+.serie-settimana { margin-bottom: 14px; }
+.serie-settimana h3 { margin: 0 0 6px; font-size: 14px; font-weight: 600; color: var(--muted); }
+.serie-volte { margin: 0; padding: 0; list-style: none; }
+.serie-volta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; min-height: 44px; border-bottom: 1px solid var(--hairline); }
+.serie-volta-giorno { min-width: 104px; font-weight: 500; text-transform: capitalize; }
+.serie-volta .task-state { margin-left: auto; }
+.serie-volta[data-stato=saltata] .serie-volta-giorno { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--hairline); }
+.today-card-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+.today-card-actions .text-button { min-height: 48px; font-size: 16px; }
+.group-head { padding: 14px 10px 6px; color: var(--muted); font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.serie-row { padding-left: 4px; }
+.serie-open { grid-template-columns: 34px minmax(0, 1fr) auto auto; }
+.serie-row.paused .task-title { color: var(--muted); }
+:root[data-style=skeu] .group-head { font-family: var(--display); }
+@media (max-width: 900px) {
+  .serie-open { grid-template-areas: "a t t" "a g s"; }
+  .serie-open .giorni-serie { grid-area: g; }
+}
