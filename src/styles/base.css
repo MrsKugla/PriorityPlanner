@@ -181,12 +181,8 @@ button:disabled { opacity: .38; cursor: default; }
 }
 .bar-actions { display: flex; align-items: center; gap: 8px; }
 .wordmark { display: flex; align-items: baseline; gap: 11px; font-family: var(--display); font-size: 22px; font-weight: 700; letter-spacing: -.02em; }
-.brand-mark { align-self: center; width: 26px; height: 26px; display: grid; grid-template-columns: repeat(5, 1fr); align-items: end; gap: 2px; padding: 3px; border-radius: 7px; background: var(--lead); }
-.brand-mark i { border-radius: 2px; background: var(--l1); height: 60%; }
-.brand-mark i:nth-child(2) { background: var(--l2); height: 90%; }
-.brand-mark i:nth-child(3) { background: var(--l3); height: 45%; }
-.brand-mark i:nth-child(4) { background: var(--l4); height: 75%; }
-.brand-mark i:nth-child(5) { background: var(--l5); height: 100%; }
+/* Il marchio è l'icona dell'app (src-tauri/app-icon.svg), la stessa di Windows e Android. */
+.brand-mark { align-self: center; display: block; width: 26px; height: 26px; flex: none; }
 .version { color: var(--muted); font-family: "Ubuntu Nerd Font", system-ui, sans-serif; font-size: 13px; font-weight: 500; letter-spacing: 0; font-variant-numeric: tabular-nums; }
 
 .pane { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; border-radius: var(--radius-pane); }

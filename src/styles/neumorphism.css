@@ -86,7 +86,6 @@
 :root[data-style=neu] .style-select:active,
 :root[data-style=neu] .text-button:active { background: var(--n-surface-down); box-shadow: var(--n-sink-s); transform: none; }
 :root[data-style=neu] .ink-button { box-shadow: var(--n-raise-s); }
-:root[data-style=neu] .brand-mark { box-shadow: var(--n-sink-s); background: var(--n-bot); }
 
 /* Le fasce sono incavate nella pagina: lì entreranno le carte in rilievo. */
 :root[data-style=neu] .slot { border: 0; background: var(--n-surface-down); box-shadow: var(--n-sink-s); }

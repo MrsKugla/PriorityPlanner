@@ -1,6 +1,11 @@
-/* Tern: il linguaggio visivo di Tern (catalogo in ../tern-ui, README e gallery.html).
-   Un tavolo caldo (--tn-page) con isole arrotondate a 12 (--tn-panel), contorni ad anello e mai bordi,
-   Geist con un mono stretto per orari e numeri, un solo accento azzurro.
+/* Tern con la palette Titanium: il linguaggio visivo di Tern (catalogo in ../tern-ui, README e gallery.html)
+   nei colori del tema «titanium» di Tern. Fonte: la definizione del tema dentro tern.exe (vars: brushedTitanium #151820,
+   darkTitanium #0f1216, electricBlue #00b4ff, deepBlue #0082b3, brightAluminum #e8ecf4, dimAluminum #9ca3b0,
+   subtleGray #2a3038, readoutGreen #00ff88, warningAmber #ffb347, alertRed #ff4757, titaniumGold #d4c090) e i colori
+   misurati sulla finestra di Tern con quel tema: tavolo #333538, riquadro #21242c, filo #3f4041,
+   scelto = velo deepBlue (#384b53 su #3f4041) con icona electricBlue.
+   Scuro = Titanium com'è in Tern. Chiaro = ricavato dalle stesse variabili (alluminio come superficie, titanio come inchiostro):
+   Tern non ha un Titanium chiaro.
    I nomi --l1…--l5 qui sono i colori delle batterie: le linee di Tern diventano --tn-l1…--tn-l4.
    Differenze volute da Tern:
    - linee e corsie più marcate (circa il doppio): Tern è fatto per un monitor, qui si legge su un tablet alla luce del giorno;
@@ -14,30 +19,38 @@
   font-family: "Geist", system-ui, sans-serif;
   --tn-mono: "Ioskeley Mono Term", ui-monospace, Consolas, monospace;
 
-  /* Superfici: tavolo → isola → foglio */
-  --tn-page: light-dark(#e9e9e5, #050506);
-  --tn-panel: light-dark(#fbfbfa, #0f0f12);
-  --tn-card: light-dark(#ffffff, #18181b);
-  --tn-raise: light-dark(#f4f4f2, #1f1f23);
-  --tn-chip: light-dark(rgba(27, 28, 48, .06), rgba(255, 255, 255, .07));
-  --tn-field: light-dark(#ffffff, rgba(255, 255, 255, .05));
-  --tn-lane: light-dark(rgba(27, 28, 32, .045), rgba(237, 237, 237, .04));
-  /* Linee: inchiostro blu-notte in trasparenza (Tern: 6, 9, 14, 22 %) */
-  --tn-l1: light-dark(rgba(24, 26, 44, .09), rgba(255, 255, 255, .09));
-  --tn-l2: light-dark(rgba(24, 26, 44, .16), rgba(255, 255, 255, .16));
-  --tn-l3: light-dark(rgba(24, 26, 44, .26), rgba(255, 255, 255, .26));
-  --tn-l4: light-dark(rgba(24, 26, 44, .38), rgba(255, 255, 255, .36));
-  /* Inchiostro e accento */
-  --tn-t1: light-dark(#1b1c20, #ededed);
-  --tn-t2: light-dark(#4d4f57, #a8a8ad);
-  --tn-t3: light-dark(#62646c, #8e8e96);
-  --tn-accent: light-dark(#3d6fff, #5a8cff);
-  --tn-accent-ink: light-dark(#2448c4, #9dbcff);
-  --tn-accent-fill: light-dark(#2f63f0, #2a5fe0);
-  --tn-grad: linear-gradient(135deg, #44cfff, #3b6cff);
-  --tn-bad: light-dark(#e5484d, #ff6166);
-  --tn-bad-ink: light-dark(#a8262b, #ff6166);
-  --tn-warn: light-dark(#d98a0b, #f5a524);
+  /* Superfici, dal tavolo verso l'alto. Scuro: un gradino più chiaro di Tern, perché sul tablet #21242c sembrava spento */
+  --tn-page: light-dark(#c2c8d1, #3a3d42);
+  --tn-panel: light-dark(#eceff3, #2a2e36);
+  --tn-card: light-dark(#f9fafc, #353b46);
+  --tn-raise: light-dark(#f3f5f8, #464a51);
+  --tn-chip: light-dark(rgba(21, 24, 32, .08), rgba(232, 236, 244, .08));
+  --tn-field: light-dark(#fbfcfd, #23272e);
+  --tn-lane: light-dark(rgba(21, 24, 32, .075), rgba(232, 236, 244, .06));
+  /* Linee: alluminio (scuro) o titanio (chiaro) in trasparenza; più marcate di Tern per il tablet */
+  --tn-l1: light-dark(rgba(21, 24, 32, .14), rgba(232, 236, 244, .11));
+  --tn-l2: light-dark(rgba(21, 24, 32, .24), rgba(232, 236, 244, .18));
+  --tn-l3: light-dark(rgba(21, 24, 32, .36), rgba(232, 236, 244, .28));
+  --tn-l4: light-dark(rgba(21, 24, 32, .5), rgba(232, 236, 244, .4));
+  /* Alone «acceso» delle cose scelte: filo d'accento, alone stretto e bagliore largo (come un LED dietro al vetro) */
+  --tn-holo: 0 0 0 1px var(--tn-accent), 0 0 0 3px rgb(from var(--tn-accent) r g b / 20%), 0 0 16px 2px rgb(from var(--tn-accent) r g b / 42%);
+  --tn-holo-soft: inset 0 0 0 1px rgb(from var(--tn-accent) r g b / 75%), 0 0 12px rgb(from var(--tn-accent) r g b / 30%);
+  /* Inchiostro: brightAluminum, ansi 7, dimAluminum; nel chiaro brushedTitanium e subtleGray */
+  --tn-t1: light-dark(#151820, #e8ecf4);
+  --tn-t2: light-dark(#232931, #c9cfd8);
+  --tn-t3: light-dark(#414855, #a7aebb);
+  /* Accento: electricBlue nello scuro, deepBlue nel chiaro (electricBlue sul grigio chiaro non regge il testo) */
+  --tn-accent: light-dark(#0082b3, #00b4ff);
+  --tn-accent-ink: light-dark(#00668d, #6ec9ff);
+  --tn-accent-fill: light-dark(#0082b3, #0082b3);
+  --tn-grad: light-dark(#0082b3, #00b4ff);
+  --tn-on-accent: light-dark(#ffffff, #0f1216);
+  /* Scelto: velo deepBlue, come la selezione di Tern */
+  --tn-sel-bg: light-dark(rgba(0, 130, 179, .14), rgba(0, 130, 179, .3));
+  --tn-ok: light-dark(#0a8a52, #00ff88);
+  --tn-bad: light-dark(#d1293a, #ff4757);
+  --tn-bad-ink: light-dark(#a51d2b, #ff7b86);
+  --tn-warn: light-dark(#a8640a, #ffb347);
   /* Card colorata: fondo e anello presi dal colore (--tone). light-dark() accetta solo colori: le percentuali scure stanno sotto. */
   --tn-tint: 9%;
   --tn-tint-ring: 45%;
@@ -47,8 +60,8 @@
   --tn-lift: 0 1px 2px light-dark(rgba(0, 0, 0, .06), rgba(0, 0, 0, .3));
   --tn-island: 0 0 0 1px var(--tn-l2), 0 16px 36px -24px light-dark(rgba(0, 0, 0, .4), transparent);
   --tn-sel-ring: 0 0 0 1px var(--tn-accent), 0 0 0 4px rgb(from var(--tn-accent) r g b / 18%);
-  --tn-field-ring: inset 0 0 0 1px rgb(from var(--tn-accent) r g b / 60%), 0 0 0 3px rgb(from var(--tn-accent) r g b / 14%);
-  --tn-modal-bg: light-dark(rgba(255, 255, 255, .9), rgba(30, 30, 34, .98));
+  --tn-field-ring: inset 0 0 0 1px rgb(from var(--tn-accent) r g b / 80%), 0 0 0 3px rgb(from var(--tn-accent) r g b / 18%), 0 0 14px rgb(from var(--tn-accent) r g b / 30%);
+  --tn-modal-bg: light-dark(rgba(232, 236, 244, .96), rgba(33, 36, 44, .98));
   --tn-dialog-shadow: 0 0 0 1px var(--tn-l3), inset 0 1px 0 light-dark(#fff, rgba(255, 255, 255, .05)),
     0 40px 100px -24px light-dark(rgba(0, 0, 0, .45), rgba(0, 0, 0, .7));
   --tn-ease: cubic-bezier(.2, .7, .2, 1);
@@ -76,7 +89,7 @@
   --edge: transparent;
   --glass-inset: none;
   --lift: var(--tn-island);
-  --backdrop: light-dark(rgba(233, 233, 229, .6), rgba(0, 0, 0, .6));
+  --backdrop: light-dark(rgba(21, 24, 32, .25), rgba(15, 18, 22, .6));
   --head-bg: var(--tn-panel);
   --radius-pane: 12px;
   --radius-control: 8px;
@@ -87,7 +100,7 @@
 
 :root[data-style=tern] body { background: var(--tn-page); font-size: 13px; letter-spacing: -.003em; }
 :root[data-style=tern] :focus-visible { outline: 2px solid var(--tn-accent); outline-offset: 2px; }
-:root[data-style=tern][data-theme=dark] { --tn-tint: 16%; --tn-tint-ring: 55%; }
+:root[data-style=tern][data-theme=dark] { --tn-tint: 18%; --tn-tint-ring: 60%; }
 :root[data-style=tern] ::selection { background: rgb(from var(--tn-accent) r g b / 24%); }
 :root[data-style=tern] .muted { color: var(--tn-t3); }
 
@@ -100,7 +113,7 @@
 :root[data-style=tern] .bar { min-height: 44px; padding: 0 2px 0 4px; gap: 6px 12px; background: transparent; box-shadow: none; }
 :root[data-style=tern] .bar-actions { gap: 6px; }
 :root[data-style=tern] .wordmark { align-items: center; gap: 8px; font-size: 14px; font-weight: 600; letter-spacing: -.01em; }
-:root[data-style=tern] .brand-mark { width: 22px; height: 22px; padding: 2.5px; gap: 1.5px; border-radius: 6px; background: light-dark(#1b1c20, #26262b); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12); }
+:root[data-style=tern] .brand-mark { width: 22px; height: 22px; }
 :root[data-style=tern] .version { font-family: var(--tn-mono); font-size: 11px; font-weight: 400; color: var(--tn-t3); }
 :root[data-style=tern] .pane-head { padding: 14px 16px 12px 20px; gap: 6px 14px; align-items: center; }
 :root[data-style=tern] .pane-head h1 { font-size: 20px; font-weight: 600; letter-spacing: -.02em; line-height: 1.2; }
@@ -134,7 +147,7 @@
 :root[data-style=tern] :is(.icon-button, .style-select, .ink-button.new-task):hover { background: light-dark(var(--tn-card), var(--tn-raise)); box-shadow: inset 0 0 0 1px var(--tn-l3), var(--tn-lift), var(--tn-hi); transition: box-shadow 0s, transform .3s var(--tn-out); }
 :root[data-style=tern] .icon-button { width: var(--tn-h); padding: 0; }
 /* Primario (.t-btn.primary): uno per vista */
-:root[data-style=tern] .ink-button { background: var(--tn-grad); color: #05070b; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .2), 0 6px 14px -8px rgb(from var(--tn-accent) r g b / 75%); }
+:root[data-style=tern] .ink-button { background: var(--tn-grad); color: var(--tn-on-accent); font-weight: 600; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .18), 0 4px 12px -6px rgb(from var(--tn-accent) r g b / 60%); }
 /* Quieto (.t-btn.quiet): nessun contorno finché non ci passi sopra */
 :root[data-style=tern] .text-button { color: var(--tn-t2); }
 :root[data-style=tern] .text-button:hover { background: var(--tn-l1); color: var(--tn-t1); transition: none; }
@@ -146,10 +159,11 @@
 :root[data-style=tern] .seg { gap: 0; padding: 2px; border: 0; border-radius: 9px; background: var(--tn-l1); box-shadow: inset 0 0 0 1px var(--tn-l1); }
 :root[data-style=tern] .seg-item { min-width: 0; min-height: var(--tn-h-sm); padding: 0 10px; border-radius: 7px; color: var(--tn-t2); font-size: 12.5px; transition: color .15s var(--tn-ease); }
 :root[data-style=tern] .seg-item:hover { color: var(--tn-t1); transition: none; }
+/* Scelto: velo deepBlue e testo azzurro, come la selezione di Tern Titanium */
 :root[data-style=tern] .seg-item:has(input:checked) {
-  background: light-dark(var(--tn-card), var(--tn-raise));
-  color: var(--tn-t1);
-  box-shadow: var(--tn-lift), 0 0 0 1px var(--tn-l2), var(--tn-hi-on);
+  background: var(--tn-sel-bg);
+  color: var(--tn-accent-ink);
+  box-shadow: inset 0 0 0 1px rgb(from var(--tn-accent) r g b / 55%), 0 0 10px rgb(from var(--tn-accent) r g b / 28%);
 }
 :root[data-style=tern] :is(.seg-item, .pick, .dot-pick, .style-choice):has(input:focus-visible) { outline: 0; box-shadow: var(--tn-sel-ring); }
 
@@ -193,7 +207,7 @@
   transition: background .15s var(--tn-ease), box-shadow .15s var(--tn-ease);
 }
 :root[data-style=tern] :is(.check input, .task-check input):hover { box-shadow: inset 0 0 0 1px var(--tn-t3); }
-:root[data-style=tern] :is(.check input, .task-check input):checked { background: var(--tn-accent-fill); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .1), 0 1px 2px rgb(from var(--tn-accent) r g b / 30%); }
+:root[data-style=tern] :is(.check input, .task-check input):checked { background: var(--tn-accent-fill); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .1), 0 0 10px 1px rgb(from var(--tn-accent) r g b / 55%); }
 :root[data-style=tern] :is(.check input, .task-check input):checked::after { content: ""; position: absolute; left: 5px; top: 2px; width: 4px; height: 8px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
 
 /* Scelte con l'icona o il numero (area, durata, costi): chip che si accende nel suo colore */
@@ -215,7 +229,8 @@
 :root[data-style=tern] :is(.pick, .dot-pick):has(input:checked) {
   background: color-mix(in srgb, var(--tone, var(--tn-accent)) 16%, var(--tn-card));
   color: var(--tn-t1);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tone, var(--tn-accent)) 60%, transparent);
+  /* Acceso nel suo colore: filo pieno e bagliore della stessa tinta */
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tone, var(--tn-accent)) 85%, transparent), 0 0 12px color-mix(in srgb, var(--tone, var(--tn-accent)) 45%, transparent);
 }
 :root[data-style=tern] .dot-pick { font-family: var(--tn-mono); font-size: 12.5px; font-weight: 500; }
 :root[data-style=tern] .cost-grid { gap: 6px; }
@@ -244,7 +259,7 @@
 :root[data-style=tern] .style-choices { gap: 6px; }
 :root[data-style=tern] .style-choice { min-height: 56px; grid-template-columns: 44px minmax(0, 1fr); gap: 12px; padding: 8px 40px 8px 8px; border: 0; border-radius: 12px; background: var(--tn-card); box-shadow: inset 0 0 0 1px var(--tn-l2); }
 :root[data-style=tern] .style-choice:hover { box-shadow: inset 0 0 0 1px var(--tn-l3); }
-:root[data-style=tern] .style-choice:has(input:checked) { background: rgb(from var(--tn-accent) r g b / 10%); box-shadow: inset 0 0 0 1px rgb(from var(--tn-accent) r g b / 45%); }
+:root[data-style=tern] .style-choice:has(input:checked) { background: var(--tn-sel-bg); box-shadow: var(--tn-holo); }
 :root[data-style=tern] .style-choice::after { right: 14px; width: 15px; height: 15px; border: 0; box-shadow: inset 0 0 0 1px var(--tn-l4); }
 :root[data-style=tern] .style-choice:has(input:checked)::after { background: var(--tn-accent-fill); box-shadow: inset 0 0 0 4px var(--tn-accent-fill), inset 0 0 0 8px #fff; }
 :root[data-style=tern] .style-choice-text strong { font-size: 13px; font-weight: 550; }
@@ -267,7 +282,7 @@
 }
 :root[data-style=tern] .card.done { opacity: .6; }
 :root[data-style=tern] .picked,
-:root[data-style=tern] :is(.card, .tray-card).picked { outline: 0; box-shadow: var(--tn-sel-ring); }
+:root[data-style=tern] :is(.card, .tray-card).picked { outline: 0; box-shadow: var(--tn-holo); }
 
 /* ---------- Settimana: corsie (.t-lane) e carte ---------- */
 :root[data-style=tern] .week-grid { gap: 8px; padding: 0 12px 12px; grid-template-columns: repeat(7, minmax(120px, 1fr)); }
@@ -275,13 +290,15 @@
 :root[data-style=tern] .day-head { align-items: center; min-height: 40px; gap: 6px; padding: 8px 4px 6px; font-size: 12.5px; }
 :root[data-style=tern] .day-name { color: var(--tn-t2); }
 :root[data-style=tern] .day-date { font-size: 15px; font-weight: 600; letter-spacing: -.014em; }
-:root[data-style=tern] .today-chip { padding: 2px 7px; background: rgb(from var(--tn-accent) r g b / 12%); color: var(--tn-accent-ink); box-shadow: inset 0 0 0 1px rgb(from var(--tn-accent) r g b / 30%); font-size: 11px; font-weight: 500; }
+:root[data-style=tern] .today-chip { padding: 2px 7px; background: var(--tn-sel-bg); color: var(--tn-accent-ink); box-shadow: none; font-size: 11px; font-weight: 500; }
 :root[data-style=tern] .party { width: 24px; height: 24px; border-radius: 6px; font-size: 13px; }
 :root[data-style=tern] .day-note { font-size: 11.5px; }
 :root[data-style=tern] .slots { gap: 4px; }
 :root[data-style=tern] .slot { gap: 4px; padding: 5px 6px 6px; border: 0; border-radius: 8px; background: var(--tn-lane); box-shadow: inset 0 0 0 1px var(--tn-l1); }
 :root[data-style=tern] .holiday .slot { background: var(--tn-lane); }
-:root[data-style=tern] .today .slot { box-shadow: inset 0 0 0 1px rgb(from var(--tn-accent) r g b / 45%); }
+/* Oggi: fasce accese, come un LED dietro al vetro */
+:root[data-style=tern] .today .slot { box-shadow: var(--tn-holo-soft); }
+/* I giorni già passati restano spenti: si vedono, ma non chiamano l'occhio */
 :root[data-style=tern] .past .slot { opacity: .55; }
 :root[data-style=tern] :is(.slot-time, .pause, .task-meta) { font-family: var(--tn-mono); font-size: 11px; font-weight: 400; letter-spacing: 0; color: var(--tn-t3); }
 :root[data-style=tern] .slot-time { padding-left: 2px; }
@@ -343,7 +360,8 @@
 :root[data-style=tern] .task-cost i { font-size: 6px; color: var(--tn-t3); }
 :root[data-style=tern] .task-meta.late { color: var(--tn-bad-ink); font-weight: 500; }
 :root[data-style=tern] .task-state { padding: 2px 7px; background: var(--tn-chip); box-shadow: inset 0 0 0 1px var(--tn-l2); color: var(--tn-t2); font-size: 11px; font-weight: 500; }
-:root[data-style=tern] .task-state[data-stato=in-settimana] { background: rgb(from var(--tn-accent) r g b / 12%); box-shadow: inset 0 0 0 1px rgb(from var(--tn-accent) r g b / 30%); color: var(--tn-accent-ink); }
+:root[data-style=tern] .task-state[data-stato=in-settimana] { background: var(--tn-sel-bg); box-shadow: none; color: var(--tn-accent-ink); }
+:root[data-style=tern] .task-state[data-stato=fatta] { background: rgb(from var(--tn-ok) r g b / 14%); box-shadow: none; color: light-dark(#0a7a49, var(--tn-ok)); }
 :root[data-style=tern] .group-head { padding: 12px 8px 4px; font-size: 12px; font-weight: 500; letter-spacing: 0; text-transform: none; color: var(--tn-t3); }
 /* Le righe delle serie non hanno la casella: rientrano quanto la casella, così le icone stanno in colonna */
 :root[data-style=tern] .serie-row { padding-left: 32px; }
@@ -375,7 +393,11 @@
 :root[data-style=tern] .rhythm-total { font-size: 12px; }
 :root[data-style=tern] .rhythm-total .input { width: 56px; min-height: var(--tn-h-sm); height: var(--tn-h-sm); }
 :root[data-style=tern] .rhythm-hint { padding: 6px 16px 12px 20px; font-size: 12px; }
-:root[data-style=tern] .brush .dot-pick { width: 44px; }
+/* Pennello: il campione riempie il bottone (la base gli dà width/height 100%: il padding del chip lo stringeva a una pillola dentro la pillola).
+   2 px di margine lasciano vedere l'anello della scelta, come il pollice di un segmento. */
+:root[data-style=tern] .brush .dot-pick { width: 40px; padding: 0; }
+:root[data-style=tern] .brush .swatch { width: calc(100% - 4px); height: calc(100% - 4px); border-radius: 6px; }
+:root[data-style=tern] .brush .dot-pick:has(input:checked) { background: transparent; box-shadow: var(--tn-holo); }
 :root[data-style=tern] .settings { padding: 14px 16px 18px 20px; font-size: 13px; }
 :root[data-style=tern] .plain-list li { min-height: 40px; border-bottom-color: var(--tn-l1); }
 :root[data-style=tern] .slot-edit .input { width: 104px; }

@@ -1,3 +1,13 @@
+0.9.4 - [28/11/2026]
+    - Nella barra in alto c'è la nuova icona dell'app, la stessa di Windows e Android, al posto delle cinque barrette (file: src/App.svelte, src/styles/base.css)
+    - Stile Tern più deciso: il chiaro ha pannelli più chiari e caselle più scure, quindi meno slavato; lo scuro è un gradino più luminoso; testi secondari più scuri nel chiaro e più chiari nello scuro (file: src/styles/tern.css)
+    - Le cose scelte si «accendono» con un bagliore azzurro: fasce di oggi, livello del pennello, carta scelta, menu e segmenti, stile scelto, caselle spuntate, campo in cui scrivi; area, durata e costi brillano nel loro colore
+
+0.9.3 - [28/11/2026]
+    - Stile Tern nei colori del tema Titanium di Tern, presi dalla definizione del tema dentro Tern: scuro in ardesia grigio-blu invece del nero, chiaro in grigio alluminio invece del bianco, accento azzurro elettrico e verde per «Fatta» (file: src/styles/tern.css)
+    - Le cose scelte (menu in alto, segmenti, «oggi», «In settimana») hanno il velo blu con testo azzurro come in Tern, invece del foglio bianco
+    - Corretto il pennello di «Il mio ritmo»: il colore del livello riempie il bottone invece di stare in una pillola più stretta dentro di esso
+
 0.9.2 - [28/11/2026]
     - «Nuova attività» più corta: scadenza, giorno preferito, orario fisso e modello stanno in «Altre opzioni», che si apre da sola se uno di questi è già compilato; nello stile Tern i costi sono 5 righe compatte di segmenti uniti (file: src/components/AttivitaDialog.svelte, src/styles/tern.css)
     - «Il mio ritmo» meno blu nello stile Tern, con orari e livelli leggibili anche sulle caselle a livello 3

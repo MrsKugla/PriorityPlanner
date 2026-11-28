@@ -4,7 +4,7 @@ export type Stile = "tern" | "neu" | "skeu" | "clay";
 export type Tema = "light" | "dark";
 
 export const STILI: Record<Stile, { nome: string; nota: string; chiaro: string; scuro: string }> = {
-  tern: { nome: "Tern", nota: "Isole chiare su un tavolo caldo, un solo accento azzurro", chiaro: "#efefec", scuro: "#08080a" },
+  tern: { nome: "Tern", nota: "Colori Titanium: ardesia, alluminio, un solo accento azzurro", chiaro: "#cdd2da", scuro: "#333538" },
   neu: { nome: "Neumorfismo", nota: "Fasce incavate, carte in rilievo", chiaro: "#e4e2da", scuro: "#25292a" },
   skeu: { nome: "Skeuomorfismo", nota: "Agenda di carta, pelle, ceramica e ottone", chiaro: "#e6dcc8", scuro: "#2b2119" },
   clay: { nome: "Claymorphism", nota: "Forme gonfie e opache, come pasta da modellare", chiaro: "#d5e3f4", scuro: "#1f2338" },

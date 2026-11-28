@@ -11,6 +11,7 @@
   import { controllaAggiornamenti } from "./lib/aggiornamento.svelte";
   import { apriSettimana, archivio, carica } from "./lib/dati.svelte";
   import { vista } from "./lib/vista.svelte";
+  import iconaApp from "../src-tauri/app-icon.svg";
 
   carica().then(() => {
     if (archivio.fase === "pronto") vista.tornate = apriSettimana();
@@ -29,7 +30,7 @@
 <div class="shell">
   <header class="bar glass">
     <div class="wordmark">
-      <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+      <img class="brand-mark" src={iconaApp} alt="" width="26" height="26" />
       <span>Priority Planner</span>
       <small class="version">v{__APP_VERSION__}</small>
     </div>
