@@ -1,10 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
-  <rect width="1024" height="1024" rx="224" fill="#121815"/>
-  <g transform="translate(192 192)">
-    <rect x="0" y="256" width="104" height="384" rx="36" fill="#4f68d6"/>
-    <rect x="130" y="64" width="104" height="576" rx="36" fill="#c8433a"/>
-    <rect x="260" y="352" width="104" height="288" rx="36" fill="#d99a2b"/>
-    <rect x="390" y="160" width="104" height="480" rx="36" fill="#3f9c9c"/>
-    <rect x="520" y="0" width="104" height="640" rx="36" fill="#5a9a4a"/>
+  <!-- palette: tema Titanium di omp/Tern (base #151820, crust #0f1216, text #e8ecf4, blue #00b4ff, gold #d4c090) -->
+  <rect width="1024" height="1024" rx="224" fill="#151820"/>
+  <g fill="#0f1216" stroke="#2c3240" stroke-width="16">
+    <rect x="136" y="212" width="560" height="160" rx="44"/>
+    <rect x="136" y="432" width="560" height="160" rx="44"/>
+    <rect x="136" y="652" width="560" height="160" rx="44"/>
+  </g>
+  <rect x="164" y="240" width="504" height="104" rx="26" fill="#3a4152"/>
+  <rect x="164" y="680" width="504" height="104" rx="26" fill="#3a4152"/>
+  <rect x="452" y="460" width="380" height="104" rx="26" fill="#00b4ff"/>
+  <g stroke="#00b4ff" stroke-width="22" stroke-linecap="round" opacity=".55">
+    <line x1="866" y1="482" x2="922" y2="482"/>
+    <line x1="866" y1="542" x2="902" y2="542"/>
   </g>
 </svg>

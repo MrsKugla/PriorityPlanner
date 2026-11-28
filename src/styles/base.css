@@ -1,5 +1,5 @@
-/* Priority Planner — struttura comune + Liquid glass (stile di partenza, D5).
-   Gli altri tre stili ridefiniscono i token sotto :root[data-style=…] nei loro file. */
+/* Priority Planner — struttura comune e valori di riserva dei token (D5).
+   I quattro stili (Tern, Neumorfismo, Skeuomorfismo, Claymorphism) ridefiniscono i token sotto :root[data-style=…] nei loro file. */
 
 @property --l1 { syntax: "<color>"; inherits: true; initial-value: #4f68d6; }
 @property --l2 { syntax: "<color>"; inherits: true; initial-value: #c8433a; }
@@ -33,8 +33,6 @@
   --on-signal: #241600;
   --float: rgb(255 255 255 / .5);
   --edge: rgb(14 20 17 / .2);
-  --light-l: .84;
-  --light-c: .75;
   --glass-inset: inset 2px 3px 1px -1px rgb(255 255 255 / 1), inset -2px -3px 1px -1px rgb(255 255 255 / .95), inset 0 0 0 1px rgb(255 255 255 / .7), inset 0 0 12px 2px rgb(20 50 42 / .18), inset 0 -16px 20px -14px rgb(255 255 255 / .8);
   --lift: 0 20px 44px -14px rgb(12 18 15 / .34), 0 2px 6px rgb(12 18 15 / .08);
   --backdrop: rgb(14 20 17 / .28);
@@ -64,8 +62,6 @@
   --on-lead: #111613;
   --float: rgb(22 27 25 / .6);
   --edge: rgb(0 0 0 / .85);
-  --light-l: .32;
-  --light-c: .55;
   --glass-inset: inset 1.5px 2px 0 -.5px rgb(255 255 255 / .34), inset -1.5px -2px 0 -.5px rgb(255 255 255 / .16), inset 0 0 0 1px rgb(255 255 255 / .05);
   --lift: 0 24px 52px -16px rgb(0 0 0 / .66), 0 2px 6px rgb(0 0 0 / .3);
   --backdrop: rgb(0 0 0 / .5);
@@ -89,27 +85,6 @@ button:disabled { opacity: .38; cursor: default; }
 :focus-visible { outline: 3px solid var(--signal); outline-offset: 3px; }
 ::selection { background: color-mix(in srgb, var(--signal) 45%, transparent); color: var(--ink); }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-
-/* La luce dietro il vetro: i cinque colori delle batterie, portati a una sola luminosità per tema. */
-.light-field {
-  --c1: oklch(from var(--l1) var(--light-l) calc(c * var(--light-c)) h);
-  --c2: oklch(from var(--l2) var(--light-l) calc(c * var(--light-c)) h);
-  --c3: oklch(from var(--l3) var(--light-l) calc(c * var(--light-c)) h);
-  --c4: oklch(from var(--l4) var(--light-l) calc(c * var(--light-c)) h);
-  --c5: oklch(from var(--l5) var(--light-l) calc(c * var(--light-c)) h);
-  position: fixed;
-  inset: -10%;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    radial-gradient(40% 48% at 12% 14%, var(--c1), transparent 72%),
-    radial-gradient(36% 44% at 86% 10%, var(--c2), transparent 72%),
-    radial-gradient(44% 50% at 74% 82%, var(--c3), transparent 74%),
-    radial-gradient(38% 46% at 18% 88%, var(--c4), transparent 72%),
-    radial-gradient(30% 36% at 50% 46%, var(--c5), transparent 70%),
-    var(--field);
-}
-:root:not([data-style=glass]) .light-field { display: none; }
 
 .glass {
   position: relative;
@@ -305,34 +280,6 @@ button:disabled { opacity: .38; cursor: default; }
 .style-choice-text strong { font-size: 16px; font-weight: 700; }
 .style-choice-text small { color: var(--muted); font-size: 13px; line-height: 1.3; }
 .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 22px; }
-:root[data-style=glass] .style-choice { box-shadow: inset 0 1px 0 var(--rim); }
-:root[data-style=glass] .style-choice:has(input:checked) { background: var(--glass-strong); box-shadow: var(--glass-inset); }
-/* Legenda in Liquid glass: gocce d'acqua colorata. Riflesso in alto a sinistra, caustica luminosa in basso, ombra morbida sotto. */
-:root[data-style=glass] .legend-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 50% 50% 48% 48% / 56% 56% 44% 44%;
-  background:
-    radial-gradient(42% 30% at 34% 24%, rgb(255 255 255 / .95), rgb(255 255 255 / 0) 100%),
-    radial-gradient(60% 34% at 55% 92%, color-mix(in srgb, var(--tone) 30%, white) , transparent 100%),
-    radial-gradient(120% 110% at 40% 30%, color-mix(in srgb, var(--tone) 10%, rgb(255 255 255 / .35)), color-mix(in srgb, var(--tone) 42%, transparent) 100%);
-  box-shadow:
-    0 4px 8px -2px color-mix(in srgb, var(--tone) 45%, rgb(0 0 0 / .35)),
-    inset 0 0 0 1px rgb(255 255 255 / .55),
-    inset -2px -3px 5px color-mix(in srgb, var(--tone) 40%, transparent),
-    inset 2px 2px 3px rgb(255 255 255 / .7);
-}
-:root[data-style=glass][data-theme=dark] .legend-icon {
-  background:
-    radial-gradient(40% 28% at 34% 24%, rgb(255 255 255 / .75), rgb(255 255 255 / 0) 100%),
-    radial-gradient(60% 34% at 55% 92%, color-mix(in srgb, var(--tone) 45%, transparent), transparent 100%),
-    radial-gradient(120% 110% at 40% 30%, color-mix(in srgb, var(--tone) 18%, rgb(255 255 255 / .08)), color-mix(in srgb, var(--tone) 50%, transparent) 100%);
-  box-shadow:
-    0 4px 10px -2px rgb(0 0 0 / .6),
-    inset 0 0 0 1px rgb(255 255 255 / .22),
-    inset -2px -3px 5px color-mix(in srgb, var(--tone) 45%, transparent),
-    inset 2px 2px 3px rgb(255 255 255 / .35);
-}
 
 /* ---------- Comandi della Fase 1: segmenti, campi, elenco ---------- */
 .grow { flex: 1; min-width: 0; }
@@ -582,3 +529,11 @@ button.giorno-serie:focus-visible { outline: 3px solid var(--signal); outline-of
   .serie-open { grid-template-areas: "a t t" "a g s"; }
   .serie-open .giorni-serie { grid-area: g; }
 }
+
+/* ---------- Finestra più corta e Oggi vuoto ---------- */
+.more { margin: 0 0 12px; border: 1px solid var(--hairline); border-radius: var(--radius-slot); }
+.more > summary { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; min-height: 44px; padding: 8px 14px; font-weight: 500; cursor: pointer; }
+.more > summary .muted { font-size: 13px; font-weight: 400; }
+.more > :not(summary) { margin-inline: 14px; }
+.more > :not(summary):first-of-type { margin-top: 12px; }
+.today-next { margin-top: 8px; padding-inline: 0; }

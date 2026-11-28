@@ -450,6 +450,8 @@
         {#if errore}<p class="serie-errore" role="alert">{errore}</p>{/if}
       </fieldset>
     {:else}
+      <details class="more" open={!!scadenza || giornoPreferito !== "" || fisso || comeModello}>
+      <summary>Altre opzioni <span class="muted">scadenza, giorno preferito, orario fisso, modello</span></summary>
       <div class="field-row">
         <label class="field grow">
           <span>Scadenza</span>
@@ -474,6 +476,19 @@
           <label class="field grow"><span>Ora</span><input class="input" type="time" bind:value={fissoOra} step="300" required /></label>
         </div>
       {/if}
+      {#if modo === "nuova" || modo === "attivita"}
+        <label class="check">
+          <input type="checkbox" bind:checked={comeModello} />
+          <span>Salva anche come modello</span>
+        </label>
+        {#if comeModello}
+          <label class="field">
+            <span>Nome del modello</span>
+            <input class="input" bind:value={nomeModello} placeholder={titolo || "Es. Telefonata medico"} maxlength="60" />
+          </label>
+        {/if}
+      {/if}
+      </details>
     {/if}
 
     {#if modo === "serie"}
@@ -496,19 +511,6 @@
           </ul>
         {/if}
       </section>
-    {/if}
-
-    {#if modo === "nuova" || modo === "attivita"}
-      <label class="check">
-        <input type="checkbox" bind:checked={comeModello} />
-        <span>Salva anche come modello</span>
-      </label>
-      {#if comeModello}
-        <label class="field">
-          <span>Nome del modello</span>
-          <input class="input" bind:value={nomeModello} placeholder={titolo || "Es. Telefonata medico"} maxlength="60" />
-        </label>
-      {/if}
     {/if}
 
     {#if scegliAmbito}

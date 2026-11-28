@@ -145,7 +145,7 @@ Decisioni in `docs/revisione-fase-6.html` (rev. 3). Versione 0.8.0, file compati
 
 | Stile | In questa app |
 |---|---|
-| Liquid glass (di partenza) | Pannelli di vetro su uno sfondo di luce sfumata; le icone della legenda sono gocce d'acqua colorata |
+| Tern (di partenza, dalla 0.9.0 al posto di Liquid glass) | Il linguaggio visivo di Tern (catalogo `../tern-ui`): tavolo caldo con isole arrotondate, contorni sottili, Geist e un mono per gli orari, un solo accento azzurro; le carte hanno una barretta del colore dell'area |
 | Neumorfismo | Fasce incavate, carte in rilievo, superficie unica senza bordi |
 | Skeuomorfismo | Copertina in pelle cucita; la settimana è una pagina d'agenda di carta con doppio margine rosso, rilegatura tra venerdì e sabato, orari a matita; bottoni in ceramica e ottone |
 | Claymorphism | Pasta da modellare: sfondo azzurro pastello, riquadri giallo burro, accenti rosa fragola; forme gonfie e opache, al massimo su due livelli |

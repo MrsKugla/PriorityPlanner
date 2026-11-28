@@ -26,8 +26,6 @@
   }
 </script>
 
-<div class="light-field" aria-hidden="true"></div>
-
 <div class="shell">
   <header class="bar glass">
     <div class="wordmark">

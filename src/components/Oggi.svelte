@@ -104,6 +104,7 @@
       {:else}
         <p class="today-empty">Per oggi basta</p>
         <p class="muted">{fatte === 1 ? "1 attività fatta" : `${fatte} attività fatte`} oggi.</p>
+        <button type="button" class="text-button today-next" onclick={() => (vista.schermata = "settimana")}>Guarda la settimana →</button>
       {/if}
     </section>
     {#if dopo}

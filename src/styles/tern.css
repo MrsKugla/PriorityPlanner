@@ -1,0 +1,400 @@
+/* Tern: il linguaggio visivo di Tern (catalogo in ../tern-ui, README e gallery.html).
+   Un tavolo caldo (--tn-page) con isole arrotondate a 12 (--tn-panel), contorni ad anello e mai bordi,
+   Geist con un mono stretto per orari e numeri, un solo accento azzurro.
+   I nomi --l1…--l5 qui sono i colori delle batterie: le linee di Tern diventano --tn-l1…--tn-l4.
+   Differenze volute da Tern:
+   - linee e corsie più marcate (circa il doppio): Tern è fatto per un monitor, qui si legge su un tablet alla luce del giorno;
+   - controlli visibili a 32 px (la misura «lg» di Tern), con un'area di tocco invisibile di 44 px sugli schermi a dito. */
+
+@font-face { font-family: "Geist"; src: url("../fonts/Geist-Variable.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: "Ioskeley Mono Term"; src: url("../fonts/IoskeleyMonoTerm-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Ioskeley Mono Term"; src: url("../fonts/IoskeleyMonoTerm-Medium.woff2") format("woff2"); font-weight: 500 600; font-display: swap; }
+
+:root[data-style=tern] {
+  font-family: "Geist", system-ui, sans-serif;
+  --tn-mono: "Ioskeley Mono Term", ui-monospace, Consolas, monospace;
+
+  /* Superfici: tavolo → isola → foglio */
+  --tn-page: light-dark(#e9e9e5, #050506);
+  --tn-panel: light-dark(#fbfbfa, #0f0f12);
+  --tn-card: light-dark(#ffffff, #18181b);
+  --tn-raise: light-dark(#f4f4f2, #1f1f23);
+  --tn-chip: light-dark(rgba(27, 28, 48, .06), rgba(255, 255, 255, .07));
+  --tn-field: light-dark(#ffffff, rgba(255, 255, 255, .05));
+  --tn-lane: light-dark(rgba(27, 28, 32, .045), rgba(237, 237, 237, .04));
+  /* Linee: inchiostro blu-notte in trasparenza (Tern: 6, 9, 14, 22 %) */
+  --tn-l1: light-dark(rgba(24, 26, 44, .09), rgba(255, 255, 255, .09));
+  --tn-l2: light-dark(rgba(24, 26, 44, .16), rgba(255, 255, 255, .16));
+  --tn-l3: light-dark(rgba(24, 26, 44, .26), rgba(255, 255, 255, .26));
+  --tn-l4: light-dark(rgba(24, 26, 44, .38), rgba(255, 255, 255, .36));
+  /* Inchiostro e accento */
+  --tn-t1: light-dark(#1b1c20, #ededed);
+  --tn-t2: light-dark(#4d4f57, #a8a8ad);
+  --tn-t3: light-dark(#62646c, #8e8e96);
+  --tn-accent: light-dark(#3d6fff, #5a8cff);
+  --tn-accent-ink: light-dark(#2448c4, #9dbcff);
+  --tn-accent-fill: light-dark(#2f63f0, #2a5fe0);
+  --tn-grad: linear-gradient(135deg, #44cfff, #3b6cff);
+  --tn-bad: light-dark(#e5484d, #ff6166);
+  --tn-bad-ink: light-dark(#a8262b, #ff6166);
+  --tn-warn: light-dark(#d98a0b, #f5a524);
+  /* Card colorata: fondo e anello presi dal colore (--tone). light-dark() accetta solo colori: le percentuali scure stanno sotto. */
+  --tn-tint: 9%;
+  --tn-tint-ring: 45%;
+  /* Profondità */
+  --tn-hi: inset 0 1px 0 light-dark(transparent, rgba(255, 255, 255, .06));
+  --tn-hi-on: inset 0 1px 0 light-dark(transparent, rgba(255, 255, 255, .09));
+  --tn-lift: 0 1px 2px light-dark(rgba(0, 0, 0, .06), rgba(0, 0, 0, .3));
+  --tn-island: 0 0 0 1px var(--tn-l2), 0 16px 36px -24px light-dark(rgba(0, 0, 0, .4), transparent);
+  --tn-sel-ring: 0 0 0 1px var(--tn-accent), 0 0 0 4px rgb(from var(--tn-accent) r g b / 18%);
+  --tn-field-ring: inset 0 0 0 1px rgb(from var(--tn-accent) r g b / 60%), 0 0 0 3px rgb(from var(--tn-accent) r g b / 14%);
+  --tn-modal-bg: light-dark(rgba(255, 255, 255, .9), rgba(30, 30, 34, .98));
+  --tn-dialog-shadow: 0 0 0 1px var(--tn-l3), inset 0 1px 0 light-dark(#fff, rgba(255, 255, 255, .05)),
+    0 40px 100px -24px light-dark(rgba(0, 0, 0, .45), rgba(0, 0, 0, .7));
+  --tn-ease: cubic-bezier(.2, .7, .2, 1);
+  --tn-out: cubic-bezier(.16, 1, .3, 1);
+  /* Misure (Tern: 22 / 28 / 32) */
+  --tn-h: 32px;
+  --tn-h-sm: 28px;
+
+  /* Token dell'app */
+  --field: var(--tn-page);
+  --ink: var(--tn-t1);
+  --muted: var(--tn-t3);
+  --glass: var(--tn-panel);
+  --glass-strong: var(--tn-card);
+  --glass-press: var(--tn-raise);
+  --well: var(--tn-lane);
+  --came: var(--tn-l1);
+  --rim: transparent;
+  --hairline: var(--tn-l2);
+  --lead: var(--tn-accent-fill);
+  --on-lead: #fff;
+  --signal: var(--tn-accent);
+  --on-signal: #fff;
+  --float: var(--tn-panel);
+  --edge: transparent;
+  --glass-inset: none;
+  --lift: var(--tn-island);
+  --backdrop: light-dark(rgba(233, 233, 229, .6), rgba(0, 0, 0, .6));
+  --head-bg: var(--tn-panel);
+  --radius-pane: 12px;
+  --radius-control: 8px;
+  --radius-slot: 8px;
+  --hour: 36px;
+  --ease-out: var(--tn-out);
+}
+
+:root[data-style=tern] body { background: var(--tn-page); font-size: 13px; letter-spacing: -.003em; }
+:root[data-style=tern] :focus-visible { outline: 2px solid var(--tn-accent); outline-offset: 2px; }
+:root[data-style=tern][data-theme=dark] { --tn-tint: 16%; --tn-tint-ring: 55%; }
+:root[data-style=tern] ::selection { background: rgb(from var(--tn-accent) r g b / 24%); }
+:root[data-style=tern] .muted { color: var(--tn-t3); }
+
+/* ---------- Cornice: la barra sta sul tavolo, il riquadro è un'isola ---------- */
+:root[data-style=tern] .glass,
+:root[data-style=tern] .day-head,
+:root[data-style=tern] .sheet::backdrop { -webkit-backdrop-filter: none; backdrop-filter: none; }
+:root[data-style=tern] .glass { background: var(--tn-panel); border: 0; box-shadow: var(--tn-island); }
+:root[data-style=tern] .shell { gap: 6px; padding: max(8px, env(safe-area-inset-top)) clamp(8px, 1vw, 12px) max(8px, env(safe-area-inset-bottom)); }
+:root[data-style=tern] .bar { min-height: 44px; padding: 0 2px 0 4px; gap: 6px 12px; background: transparent; box-shadow: none; }
+:root[data-style=tern] .bar-actions { gap: 6px; }
+:root[data-style=tern] .wordmark { align-items: center; gap: 8px; font-size: 14px; font-weight: 600; letter-spacing: -.01em; }
+:root[data-style=tern] .brand-mark { width: 22px; height: 22px; padding: 2.5px; gap: 1.5px; border-radius: 6px; background: light-dark(#1b1c20, #26262b); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12); }
+:root[data-style=tern] .version { font-family: var(--tn-mono); font-size: 11px; font-weight: 400; color: var(--tn-t3); }
+:root[data-style=tern] .pane-head { padding: 14px 16px 12px 20px; gap: 6px 14px; align-items: center; }
+:root[data-style=tern] .pane-head h1 { font-size: 20px; font-weight: 600; letter-spacing: -.02em; line-height: 1.2; }
+:root[data-style=tern] .head-tools { gap: 6px 12px; }
+:root[data-style=tern] .week-empty { font-size: 12.5px; color: var(--tn-t3); }
+:root[data-style=tern] :is(.week-grid, .rhythm-grid, .task-list, .tray, .today, .settings) { scrollbar-color: var(--tn-l3) transparent; }
+
+/* ---------- Bottoni (.t-btn) ---------- */
+:root[data-style=tern] :is(.icon-button, .style-select, .ink-button, .text-button) {
+  position: relative;
+  min-height: var(--tn-h);
+  height: var(--tn-h);
+  padding: 0 11px;
+  gap: 6px;
+  border: 0;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: -.003em;
+  transition: background .15s var(--tn-ease), color .15s var(--tn-ease), box-shadow .15s var(--tn-ease), transform .3s var(--tn-out);
+}
+:root[data-style=tern] :is(.icon-button, .style-select, .ink-button, .text-button):active { transform: scale(.97); transition: transform .1s var(--tn-out); }
+:root[data-style=tern] :is(.icon-button, .style-select, .ink-button, .text-button) .icon { width: 14px; height: 14px; stroke-width: 1.7; }
+:root[data-style=tern] :is(.style-select, .ink-button) > .icon:first-child:not(:only-child) { margin-left: -2px; }
+/* In rilievo (.t-btn.raised): bottoni della barra */
+:root[data-style=tern] :is(.icon-button, .style-select, .ink-button.new-task) {
+  background: light-dark(var(--tn-card), var(--tn-raise));
+  color: var(--tn-t1);
+  box-shadow: inset 0 0 0 1px var(--tn-l2), var(--tn-lift), var(--tn-hi);
+}
+:root[data-style=tern] :is(.icon-button, .style-select, .ink-button.new-task):hover { background: light-dark(var(--tn-card), var(--tn-raise)); box-shadow: inset 0 0 0 1px var(--tn-l3), var(--tn-lift), var(--tn-hi); transition: box-shadow 0s, transform .3s var(--tn-out); }
+:root[data-style=tern] .icon-button { width: var(--tn-h); padding: 0; }
+/* Primario (.t-btn.primary): uno per vista */
+:root[data-style=tern] .ink-button { background: var(--tn-grad); color: #05070b; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .2), 0 6px 14px -8px rgb(from var(--tn-accent) r g b / 75%); }
+/* Quieto (.t-btn.quiet): nessun contorno finché non ci passi sopra */
+:root[data-style=tern] .text-button { color: var(--tn-t2); }
+:root[data-style=tern] .text-button:hover { background: var(--tn-l1); color: var(--tn-t1); transition: none; }
+:root[data-style=tern] .danger,
+:root[data-style=tern] .text-button.danger { color: var(--tn-bad-ink); }
+:root[data-style=tern] .text-button.danger:hover { background: rgb(from var(--tn-bad) r g b / 9%); }
+
+/* ---------- Segmenti (.t-seg) ---------- */
+:root[data-style=tern] .seg { gap: 0; padding: 2px; border: 0; border-radius: 9px; background: var(--tn-l1); box-shadow: inset 0 0 0 1px var(--tn-l1); }
+:root[data-style=tern] .seg-item { min-width: 0; min-height: var(--tn-h-sm); padding: 0 10px; border-radius: 7px; color: var(--tn-t2); font-size: 12.5px; transition: color .15s var(--tn-ease); }
+:root[data-style=tern] .seg-item:hover { color: var(--tn-t1); transition: none; }
+:root[data-style=tern] .seg-item:has(input:checked) {
+  background: light-dark(var(--tn-card), var(--tn-raise));
+  color: var(--tn-t1);
+  box-shadow: var(--tn-lift), 0 0 0 1px var(--tn-l2), var(--tn-hi-on);
+}
+:root[data-style=tern] :is(.seg-item, .pick, .dot-pick, .style-choice):has(input:focus-visible) { outline: 0; box-shadow: var(--tn-sel-ring); }
+
+/* ---------- Campi (.t-input) e caselle (.t-check) ---------- */
+:root[data-style=tern] .input {
+  min-height: var(--tn-h);
+  height: var(--tn-h);
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  background-color: var(--tn-field);
+  color: var(--tn-t1);
+  font-size: 13px;
+  box-shadow: inset 0 0 0 1px var(--tn-l2), 0 1px 1px light-dark(rgba(0, 0, 0, .04), transparent);
+  transition: box-shadow .15s var(--tn-ease);
+}
+:root[data-style=tern] select.input { padding-right: 6px; }
+:root[data-style=tern] .input:hover { box-shadow: inset 0 0 0 1px var(--tn-l3); transition: none; }
+:root[data-style=tern] .input:focus,
+:root[data-style=tern] .input:focus-visible { outline: 0; box-shadow: var(--tn-field-ring); }
+:root[data-style=tern] .input::placeholder { color: var(--tn-t3); opacity: 1; }
+:root[data-style=tern] .input-num { width: 72px; font-family: var(--tn-mono); font-size: 12.5px; }
+:root[data-style=tern] .search .icon { left: 10px; width: 14px; height: 14px; }
+:root[data-style=tern] .search .input { padding-left: 32px; }
+:root[data-style=tern] .field { gap: 5px; margin-bottom: 14px; }
+:root[data-style=tern] .field > span,
+:root[data-style=tern] .field > legend { color: var(--tn-t2); font-size: 12px; font-weight: 500; }
+:root[data-style=tern] .field-inline { gap: 6px; font-size: 12.5px; }
+:root[data-style=tern] .check { min-height: var(--tn-h); gap: 8px; margin-bottom: 4px; font-size: 13px; }
+:root[data-style=tern] :is(.check input, .task-check input) {
+  position: relative;
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  appearance: none;
+  border-radius: 4px;
+  background: var(--tn-field);
+  box-shadow: inset 0 0 0 1px var(--tn-l4);
+  cursor: pointer;
+  transition: background .15s var(--tn-ease), box-shadow .15s var(--tn-ease);
+}
+:root[data-style=tern] :is(.check input, .task-check input):hover { box-shadow: inset 0 0 0 1px var(--tn-t3); }
+:root[data-style=tern] :is(.check input, .task-check input):checked { background: var(--tn-accent-fill); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .1), 0 1px 2px rgb(from var(--tn-accent) r g b / 30%); }
+:root[data-style=tern] :is(.check input, .task-check input):checked::after { content: ""; position: absolute; left: 5px; top: 2px; width: 4px; height: 8px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+
+/* Scelte con l'icona o il numero (area, durata, costi): chip che si accende nel suo colore */
+:root[data-style=tern] .pick-row { gap: 6px; }
+:root[data-style=tern] :is(.pick, .dot-pick) {
+  min-width: 36px;
+  height: var(--tn-h);
+  padding: 0 9px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--tn-chip);
+  color: var(--tn-t2);
+  box-shadow: inset 0 0 0 1px var(--tn-l2);
+  transition: background .15s var(--tn-ease), box-shadow .15s var(--tn-ease), transform .3s var(--tn-out);
+}
+:root[data-style=tern] .pick { font-size: 16px; }
+:root[data-style=tern] .pick-text { font-size: 12.5px; }
+:root[data-style=tern] :is(.pick, .dot-pick):hover { box-shadow: inset 0 0 0 1px var(--tn-l3); transition: none; }
+:root[data-style=tern] :is(.pick, .dot-pick):has(input:checked) {
+  background: color-mix(in srgb, var(--tone, var(--tn-accent)) 16%, var(--tn-card));
+  color: var(--tn-t1);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tone, var(--tn-accent)) 60%, transparent);
+}
+:root[data-style=tern] .dot-pick { font-family: var(--tn-mono); font-size: 12.5px; font-weight: 500; }
+:root[data-style=tern] .cost-grid { gap: 6px; }
+/* Costi come una riga di segmenti uniti (.t-seg): 5 righe compatte invece di 20 bottoni */
+:root[data-style=tern] .cost-row { grid-template-columns: 24px repeat(4, 36px); gap: 0; justify-content: start; }
+:root[data-style=tern] .cost-row .dot-pick { height: var(--tn-h-sm); min-width: 0; border-radius: 0; }
+:root[data-style=tern] .cost-row .dot-pick:nth-child(2) { border-radius: 7px 0 0 7px; }
+:root[data-style=tern] .cost-row .dot-pick:last-child { border-radius: 0 7px 7px 0; }
+:root[data-style=tern] .cost-grid { gap: 4px; }
+:root[data-style=tern] .cost-icon { font-size: 17px; }
+
+/* Area di tocco: 44 px invisibili intorno ai controlli da 32 sugli schermi a dito */
+@media (pointer: coarse) {
+  :root[data-style=tern] :is(.icon-button, .style-select, .ink-button, .text-button, .pick, .dot-pick, .giorno-serie)::before { content: ""; position: absolute; inset: -6px -2px; }
+  :root[data-style=tern] .seg-item input { inset: -6px 0; }
+}
+
+/* ---------- Finestre (.t-dialog) ---------- */
+:root[data-style=tern] .sheet { width: min(480px, calc(100vw - 24px)); max-height: min(760px, calc(100dvh - 24px)); padding: 18px 20px; border: 0; border-radius: 16px; background: var(--tn-modal-bg); box-shadow: var(--tn-dialog-shadow); }
+:root[data-style=tern] .task-sheet { width: min(520px, calc(100vw - 24px)); }
+:root[data-style=tern] .sheet::backdrop { background: var(--backdrop); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
+:root[data-style=tern] .sheet[open] { animation: tern-in .34s var(--tn-out); }
+@keyframes tern-in { from { opacity: 0; transform: translateY(10px) scale(.97); } }
+:root[data-style=tern] :is(.task-form, .style-form) h2 { margin-bottom: 14px; font-size: 16.5px; font-weight: 600; letter-spacing: -.014em; }
+:root[data-style=tern] .dialog-actions { gap: 6px; margin-top: 16px; }
+:root[data-style=tern] .style-choices { gap: 6px; }
+:root[data-style=tern] .style-choice { min-height: 56px; grid-template-columns: 44px minmax(0, 1fr); gap: 12px; padding: 8px 40px 8px 8px; border: 0; border-radius: 12px; background: var(--tn-card); box-shadow: inset 0 0 0 1px var(--tn-l2); }
+:root[data-style=tern] .style-choice:hover { box-shadow: inset 0 0 0 1px var(--tn-l3); }
+:root[data-style=tern] .style-choice:has(input:checked) { background: rgb(from var(--tn-accent) r g b / 10%); box-shadow: inset 0 0 0 1px rgb(from var(--tn-accent) r g b / 45%); }
+:root[data-style=tern] .style-choice::after { right: 14px; width: 15px; height: 15px; border: 0; box-shadow: inset 0 0 0 1px var(--tn-l4); }
+:root[data-style=tern] .style-choice:has(input:checked)::after { background: var(--tn-accent-fill); box-shadow: inset 0 0 0 4px var(--tn-accent-fill), inset 0 0 0 8px #fff; }
+:root[data-style=tern] .style-choice-text strong { font-size: 13px; font-weight: 550; }
+:root[data-style=tern] .style-choice-text small { font-size: 12px; }
+:root[data-style=tern] .style-choice-swatch { height: 40px; border-radius: 8px; box-shadow: inset 0 0 0 1px var(--tn-l2); }
+
+/* ---------- Card colorate (.t-card con tono): fondo e anello presi dal colore dell'area ---------- */
+:root[data-style=tern] :is(.card, .tray-card, .today-card) {
+  border: 0;
+  background: color-mix(in srgb, var(--tone) var(--tn-tint), var(--tn-card));
+  color: var(--tn-t1);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tone) var(--tn-tint-ring), transparent), var(--tn-lift);
+}
+:root[data-style=tern] :is(.card, .tray-card):hover { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tone) 75%, transparent), var(--tn-lift); }
+/* Proposta: stesso colore, fondo appena accennato, contorno tratteggiato */
+:root[data-style=tern] :is(.card, .today-card).proposed {
+  border: 1px dashed color-mix(in srgb, var(--tone) 60%, transparent);
+  background: color-mix(in srgb, var(--tone) 5%, transparent);
+  box-shadow: none;
+}
+:root[data-style=tern] .card.done { opacity: .6; }
+:root[data-style=tern] .picked,
+:root[data-style=tern] :is(.card, .tray-card).picked { outline: 0; box-shadow: var(--tn-sel-ring); }
+
+/* ---------- Settimana: corsie (.t-lane) e carte ---------- */
+:root[data-style=tern] .week-grid { gap: 8px; padding: 0 12px 12px; grid-template-columns: repeat(7, minmax(120px, 1fr)); }
+:root[data-style=tern] .day { gap: 4px; }
+:root[data-style=tern] .day-head { align-items: center; min-height: 40px; gap: 6px; padding: 8px 4px 6px; font-size: 12.5px; }
+:root[data-style=tern] .day-name { color: var(--tn-t2); }
+:root[data-style=tern] .day-date { font-size: 15px; font-weight: 600; letter-spacing: -.014em; }
+:root[data-style=tern] .today-chip { padding: 2px 7px; background: rgb(from var(--tn-accent) r g b / 12%); color: var(--tn-accent-ink); box-shadow: inset 0 0 0 1px rgb(from var(--tn-accent) r g b / 30%); font-size: 11px; font-weight: 500; }
+:root[data-style=tern] .party { width: 24px; height: 24px; border-radius: 6px; font-size: 13px; }
+:root[data-style=tern] .day-note { font-size: 11.5px; }
+:root[data-style=tern] .slots { gap: 4px; }
+:root[data-style=tern] .slot { gap: 4px; padding: 5px 6px 6px; border: 0; border-radius: 8px; background: var(--tn-lane); box-shadow: inset 0 0 0 1px var(--tn-l1); }
+:root[data-style=tern] .holiday .slot { background: var(--tn-lane); }
+:root[data-style=tern] .today .slot { box-shadow: inset 0 0 0 1px rgb(from var(--tn-accent) r g b / 45%); }
+:root[data-style=tern] .past .slot { opacity: .55; }
+:root[data-style=tern] :is(.slot-time, .pause, .task-meta) { font-family: var(--tn-mono); font-size: 11px; font-weight: 400; letter-spacing: 0; color: var(--tn-t3); }
+:root[data-style=tern] .slot-time { padding-left: 2px; }
+:root[data-style=tern] .slot-drop { border: 1px dashed rgb(from var(--tn-accent) r g b / 60%); background: rgb(from var(--tn-accent) r g b / 7%); }
+:root[data-style=tern] .slot-drop:hover,
+:root[data-style=tern] .slot-drop:focus-visible { background: rgb(from var(--tn-accent) r g b / 15%); }
+:root[data-style=tern] .card { gap: 1px; padding: 5px 8px 6px; border-radius: 6px; }
+:root[data-style=tern] .card-top { gap: 5px; }
+:root[data-style=tern] .card-area { font-size: 12px; }
+:root[data-style=tern] .card-title { font-size: 12.5px; font-weight: 550; }
+:root[data-style=tern] .card-lock { font-size: 10px; }
+:root[data-style=tern] .card-why { font-size: 11px; color: var(--tn-t2); }
+:root[data-style=tern] .card-cont { font-size: 11px; }
+:root[data-style=tern] .tray { width: 200px; padding: 0 4px 12px 12px; }
+:root[data-style=tern] .tray h2 { margin: 12px 6px 6px 0; font-size: 12.5px; font-weight: 550; color: var(--tn-t2); }
+:root[data-style=tern] .tray h2 .muted { font-family: var(--tn-mono); font-size: 11px; font-weight: 400; }
+:root[data-style=tern] .tray ul { gap: 4px; padding-right: 6px; }
+:root[data-style=tern] .tray-card { min-height: 34px; gap: 6px; padding: 6px 8px; border-radius: 8px; font-size: 12.5px; }
+:root[data-style=tern] .tray-card small { font-size: 11px; color: var(--tn-t2); }
+:root[data-style=tern] .tray-empty { font-size: 12.5px; }
+:root[data-style=tern] :is(.pick-bar, .week-note) { gap: 4px 8px; padding: 6px 16px 6px 20px; font-size: 12.5px; }
+:root[data-style=tern] .pick-title { font-weight: 550; }
+:root[data-style=tern] .legend { gap: 4px 14px; padding: 8px 16px 10px; font-size: 12px; color: var(--tn-t2); }
+:root[data-style=tern] .legend > span { gap: 5px; }
+:root[data-style=tern] .legend-icon { width: 20px; height: 20px; border-radius: 6px; font-size: 12px; }
+:root[data-style=tern] .legend-sep { height: 14px; background: var(--tn-l2); }
+
+/* ---------- Oggi ---------- */
+:root[data-style=tern] .today-date { font-size: 13px; font-weight: 400; color: var(--tn-t3); }
+:root[data-style=tern] .checkin { gap: 6px 10px; padding: 10px 16px 10px 20px; font-size: 12.5px; }
+:root[data-style=tern] .today-body { gap: 16px; padding: 18px 20px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); }
+:root[data-style=tern] .today-body h2 { margin-bottom: 8px; font-size: 13px; font-weight: 550; color: var(--tn-t2); }
+:root[data-style=tern] .today-body h2 .muted { font-family: var(--tn-mono); font-size: 11.5px; font-weight: 400; }
+:root[data-style=tern] .today-card { gap: 10px; padding: 12px 14px; border-radius: 12px; }
+:root[data-style=tern] .today-card-top { gap: 8px; }
+:root[data-style=tern] .today-card h3 { font-size: 16.5px; font-weight: 600; letter-spacing: -.014em; }
+:root[data-style=tern] .today-card-meta { gap: 4px 12px; font-family: var(--tn-mono); font-size: 12px; color: var(--tn-t2); }
+:root[data-style=tern] .today-costs { gap: 8px; }
+:root[data-style=tern] .today-card :is(.ink-button, .text-button) { min-height: var(--tn-h); padding-inline: 12px; font-size: 12.5px; }
+:root[data-style=tern] .today-card-actions { gap: 6px; }
+:root[data-style=tern] .today-empty { margin-bottom: 2px; font-size: 16.5px; font-weight: 600; letter-spacing: -.014em; }
+
+/* ---------- Tutte le attività: righe (.t-list) ---------- */
+:root[data-style=tern] .list-tools { gap: 8px 12px; padding: 10px 16px 10px 20px; }
+:root[data-style=tern] .search { flex-basis: 200px; max-width: 300px; }
+:root[data-style=tern] .task-list { padding: 4px 12px 12px; }
+:root[data-style=tern] .task-row { gap: 0; border-bottom-color: var(--tn-l1); }
+:root[data-style=tern] .task-check { width: 32px; height: 40px; }
+:root[data-style=tern] .task-open { min-height: 40px; padding: 4px 8px; gap: 10px; border-radius: 6px; grid-template-columns: 24px minmax(0, 1fr) auto 56px 92px 96px; }
+@media (max-width: 900px) {
+  :root[data-style=tern] :is(.task-open, .serie-open) { grid-template-columns: 24px minmax(0, 1fr) auto; row-gap: 2px; }
+  :root[data-style=tern] .task-costs { min-width: 0; flex-wrap: wrap; gap: 2px 8px; }
+}
+:root[data-style=tern] .task-open:hover { background: var(--tn-l1); }
+:root[data-style=tern] .task-area { width: 24px; height: 24px; border-radius: 6px; font-size: 13px; background: color-mix(in srgb, var(--tone) 16%, transparent); }
+:root[data-style=tern] .task-title { font-size: 13px; font-weight: 500; }
+:root[data-style=tern] .task-costs { gap: 8px; }
+:root[data-style=tern] .task-cost { font-size: 12px; }
+:root[data-style=tern] .task-cost i { font-size: 6px; color: var(--tn-t3); }
+:root[data-style=tern] .task-meta.late { color: var(--tn-bad-ink); font-weight: 500; }
+:root[data-style=tern] .task-state { padding: 2px 7px; background: var(--tn-chip); box-shadow: inset 0 0 0 1px var(--tn-l2); color: var(--tn-t2); font-size: 11px; font-weight: 500; }
+:root[data-style=tern] .task-state[data-stato=in-settimana] { background: rgb(from var(--tn-accent) r g b / 12%); box-shadow: inset 0 0 0 1px rgb(from var(--tn-accent) r g b / 30%); color: var(--tn-accent-ink); }
+:root[data-style=tern] .group-head { padding: 12px 8px 4px; font-size: 12px; font-weight: 500; letter-spacing: 0; text-transform: none; color: var(--tn-t3); }
+/* Le righe delle serie non hanno la casella: rientrano quanto la casella, così le icone stanno in colonna */
+:root[data-style=tern] .serie-row { padding-left: 32px; }
+@media (min-width: 901px) { :root[data-style=tern] .serie-open { grid-template-columns: 24px minmax(0, 1fr) auto auto; } }
+:root[data-style=tern] .ripete { color: var(--tn-accent-ink); font-weight: 500; }
+:root[data-style=tern] .empty { gap: 10px; }
+:root[data-style=tern] .empty p { font-size: 13.5px; }
+:root[data-style=tern] .notice { padding: 10px 14px; font-size: 12.5px; background: rgb(from var(--tn-warn) r g b / 10%); box-shadow: inset 0 0 0 1px rgb(from var(--tn-warn) r g b / 30%); }
+
+/* ---------- Ritmo, serie, Importa / Esporta ---------- */
+:root[data-style=tern] .rhythm-grid { gap: 6px; padding: 0 12px 8px; }
+:root[data-style=tern] .rhythm-col { gap: 4px; }
+:root[data-style=tern] .rhythm-cell {
+  min-height: var(--tn-h);
+  padding: 2px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--tone) calc(var(--lv) * 11%), var(--tn-lane));
+  box-shadow: inset 0 0 0 1px var(--tn-l1);
+}
+:root[data-style=tern] .rhythm-cell .slot-time { color: var(--tn-t1); opacity: .75; }
+:root[data-style=tern] .rhythm-cell b { color: var(--tn-t1); }
+/* Altre opzioni nella finestra e azione sotto Oggi vuoto */
+:root[data-style=tern] .more { margin-bottom: 8px; border: 0; border-radius: 12px; box-shadow: inset 0 0 0 1px var(--tn-l2); }
+:root[data-style=tern] .more > summary { min-height: var(--tn-h); padding: 8px 12px; font-size: 12.5px; font-weight: 500; }
+:root[data-style=tern] .more > summary .muted { font-weight: 400; }
+:root[data-style=tern] .more[open] > summary { box-shadow: inset 0 -1px 0 var(--tn-l1); }
+:root[data-style=tern] .rhythm-cell b { font-family: var(--tn-mono); font-size: 12.5px; font-weight: 500; }
+:root[data-style=tern] .rhythm-total { font-size: 12px; }
+:root[data-style=tern] .rhythm-total .input { width: 56px; min-height: var(--tn-h-sm); height: var(--tn-h-sm); }
+:root[data-style=tern] .rhythm-hint { padding: 6px 16px 12px 20px; font-size: 12px; }
+:root[data-style=tern] .brush .dot-pick { width: 44px; }
+:root[data-style=tern] .settings { padding: 14px 16px 18px 20px; font-size: 13px; }
+:root[data-style=tern] .plain-list li { min-height: 40px; border-bottom-color: var(--tn-l1); }
+:root[data-style=tern] .slot-edit .input { width: 104px; }
+:root[data-style=tern] .giorni-serie { gap: 4px 8px; margin-bottom: 10px; }
+:root[data-style=tern] .giorni-serie-set { gap: 3px; }
+:root[data-style=tern] .giorno-serie { position: relative; width: 28px; min-height: 28px; border-radius: 6px; background: var(--tn-chip); box-shadow: inset 0 0 0 1px var(--tn-l2); color: var(--tn-t2); font-size: 12px; font-weight: 550; }
+:root[data-style=tern] .giorno-serie.on { background: color-mix(in srgb, var(--tone, var(--tn-accent)) 20%, var(--tn-card)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tone, var(--tn-accent)) 65%, transparent); color: var(--tn-t1); }
+:root[data-style=tern] .giorni-serie.piccola .giorno-serie { width: 16px; min-height: 18px; border-radius: 4px; font-size: 10px; }
+:root[data-style=tern] .giorni-serie-testo { font-family: var(--tn-mono); font-size: 12px; color: var(--tn-t2); }
+:root[data-style=tern] .giorni-serie.piccola .giorni-serie-testo { font-size: 11px; }
+:root[data-style=tern] :is(.serie-box, .serie-ambito, .exchange-confirm) { border: 0; border-radius: 12px; background: var(--tn-card); box-shadow: inset 0 0 0 1px var(--tn-l2); }
+:root[data-style=tern] .serie-settimana h3 { font-size: 12.5px; font-weight: 550; color: var(--tn-t2); }
+:root[data-style=tern] .serie-volta { min-height: 36px; font-size: 12.5px; border-bottom-color: var(--tn-l1); }
+
+/* ---------- Telefono ---------- */
+@media (max-width: 640px) {
+  :root[data-style=tern] .pane-head { padding: 12px 12px 10px 14px; }
+  :root[data-style=tern] .pane-head h1 { font-size: 18px; }
+  :root[data-style=tern] .style-select { width: var(--tn-h); padding: 0; }
+  :root[data-style=tern] :is(.list-tools, .checkin, .pick-bar, .week-note) { padding-inline: 12px; }
+  :root[data-style=tern] .serie-row { padding-left: 0; }
+}
